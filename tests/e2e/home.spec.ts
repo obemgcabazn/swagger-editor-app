@@ -9,7 +9,5 @@ test('loads the home page', async ({ page }) => {
 test('displays the welcome message', async ({ page }) => {
   await page.goto('/');
 
-  // This checks for some text that is present on the default Next.js or starter home page.
-  // Adjust this selector as needed for your own home page content.
-  await expect(page.getByText(/welcome/i)).toBeVisible();
+  await expect(page.getByText(/looking for a starting point/i)).toBeVisible();
 });
