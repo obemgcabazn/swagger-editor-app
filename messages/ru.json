@@ -1,0 +1,22 @@
+{
+  "Error": {
+    "title": "Что-то пошло не так",
+    "description": "Произошла непредвиденная ошибка. Попробуйте еще раз.",
+    "retry": "Попробовать снова"
+  },
+  "HomePage": {
+    "title": "Swagger Editor App",
+    "description": "Вставляйте, редактируйте, просматривайте и тестируйте OpenAPI-спецификации в одном интерфейсе.",
+    "primaryAction": "Начать редактирование",
+    "secondaryAction": "Открыть документацию"
+  },
+  "Metadata": {
+    "title": "Swagger Editor App",
+    "description": "Редактор, просмотрщик и REST-клиент для Swagger/OpenAPI."
+  },
+  "NotFoundPage": {
+    "title": "Страница не найдена",
+    "description": "Страница, которую вы ищете, не существует.",
+    "homeLink": "На главную"
+  }
+}
