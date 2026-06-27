@@ -1,6 +1,10 @@
 .next
 node_modules
+coverage
+playwright-report
 public
+supabase/.temp
+test-results
 *.lock
 package-lock.json
 tsconfig.json
