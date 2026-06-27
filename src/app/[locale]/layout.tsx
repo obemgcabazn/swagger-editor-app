@@ -4,6 +4,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
+import { AppShell } from '@/components/app-shell/app-shell';
 import { routing } from '@/i18n/routing';
 
 const geistSans = Geist({
@@ -55,7 +56,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     >
       <body className="flex min-h-full flex-col">
         <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
+          <AppShell>{children}</AppShell>
         </NextIntlClientProvider>
       </body>
     </html>
