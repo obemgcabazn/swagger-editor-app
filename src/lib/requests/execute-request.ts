@@ -1,5 +1,6 @@
 const ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'] as const;
 
+// Transport level headers usually controlled by browser itself, not us
 const BLOCKED_REQUEST_HEADERS = new Set([
   'connection',
   'content-length',
@@ -102,7 +103,7 @@ export function parseExecuteRequestPayload(payload: unknown): ParseResult {
 
 export async function executeExternalRequest(
   input: ExecuteRequestInput,
-  fetchImpl: FetchLike = fetch
+  fetchImpl: FetchLike = fetch // we pass fetchIml via DI for easines of mocking fetch in Unit tests
 ): Promise<ExecuteRequestResult> {
   const startedAt = performance.now();
   const requestBody = input.body || undefined;
