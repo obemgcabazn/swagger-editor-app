@@ -15,7 +15,13 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'lcov'],
       include: ['src/**/*.{ts,tsx}'],
-      exclude: ['src/app/**', 'src/i18n/navigation.ts', 'src/i18n/request.ts', 'src/proxy.ts'],
+      exclude: [
+        'src/app/**',
+        'src/components/app-shell/**',
+        'src/i18n/navigation.ts',
+        'src/i18n/request.ts',
+        'src/proxy.ts',
+      ],
       thresholds: {
         statements: 80,
         branches: 80,

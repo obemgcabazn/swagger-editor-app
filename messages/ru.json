@@ -1,8 +1,27 @@
 {
+  "AboutPage": {
+    "courseDescription": "Проект выполняется в рамках курса React в RS School командой из трех человек.",
+    "courseTitle": "Курс RS School",
+    "description": "Информация о назначении Swagger/OpenAPI UI, технологиях и команде разработки.",
+    "eyebrow": "О проекте",
+    "techDescription": "Приложение строится на Next.js App Router, next-intl, shadcn/ui, Tailwind CSS, TypeScript, а для авторизации и истории планируется Supabase.",
+    "techTitle": "Технологический стек",
+    "title": "О Swagger Editor App"
+  },
+  "Auth": {
+    "history": "История",
+    "signOut": "Выйти",
+    "signIn": "Войти",
+    "signUp": "Регистрация"
+  },
   "Error": {
     "title": "Что-то пошло не так",
     "description": "Произошла непредвиденная ошибка. Попробуйте еще раз.",
     "retry": "Попробовать снова"
+  },
+  "Footer": {
+    "copyright": "Создано для RS School.",
+    "description": "Редактор и просмотрщик Swagger/OpenAPI, REST-клиент и история запросов в одном локализованном приложении."
   },
   "HomePage": {
     "title": "Swagger Editor App",
@@ -18,5 +37,11 @@
     "title": "Страница не найдена",
     "description": "Страница, которую вы ищете, не существует.",
     "homeLink": "На главную"
+  },
+  "Navigation": {
+    "about": "О проекте",
+    "brand": "Swagger Editor App",
+    "language": "Язык",
+    "main": "Главная"
   }
 }
