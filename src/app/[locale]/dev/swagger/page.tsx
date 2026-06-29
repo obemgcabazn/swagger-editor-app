@@ -1,6 +1,12 @@
+import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 
-import { DevSwaggerPanel } from './panel';
+const DevSwaggerPanel =
+  process.env.NODE_ENV === 'development'
+    ? dynamic(() => import('./panel').then((mod) => mod.DevSwaggerPanel))
+    : function DevSwaggerPanelStub() {
+        return null;
+      };
 
 export default function DevSwaggerPage() {
   if (process.env.NODE_ENV !== 'development') {
