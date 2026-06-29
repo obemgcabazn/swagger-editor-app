@@ -30,14 +30,11 @@ export async function createSupabaseServerClient() {
 
 export async function getCurrentUser() {
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getClaims();
 
-  if (error) {
+  if (error || !data) {
     return null;
   }
 
-  return user;
+  return data.claims;
 }
