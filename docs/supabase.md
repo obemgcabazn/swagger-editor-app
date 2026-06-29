@@ -69,7 +69,7 @@ Use server-side Supabase calls for:
 - Reading the current user.
 - Loading saved schemas.
 - Saving schemas from app-owned endpoints/actions.
-- Recording request analytics from the proxy route.
+- Recording request analytics from the request execution route.
 - Rendering History and Analytics pages.
 
 We did not add a browser Supabase client. Add will add only if a feature needs realtime subscriptions or another client-only Supabase capability.
@@ -102,13 +102,54 @@ The route uses normal Supabase Auth and sets real Supabase session cookies, so R
 
 The route returns `404` outside `NODE_ENV=development` and should not be used as production authentication.
 
+## Temporary Request Smoke Test
+
+Until the real Swagger UI is implemented, a development-only page can verify request execution and history recording:
+
+```text
+/en/dev/swagger
+```
+
+The page has four actions:
+
+1. Execute a baked-in external request while unauthenticated. The response should include `analytics.recorded: false`.
+2. Call `POST /api/dev/sign-in` with the configured development user.
+3. Execute another baked-in external request while authenticated. The response should include `analytics.recorded: true`, and a row should appear in `request_history`.
+4. Call `POST /api/dev/sign-out` to clear Supabase auth cookies.
+
+The page calls same-origin API routes from the browser, so cookies from development sign-in are reused automatically.
+
 ## Planned App Contracts
 
-Recommended future routes/actions:
+Implemented route:
 
 - `POST /api/requests/execute`: execute external REST requests through the server and record analytics.
-- `GET /api/schemas/current`: load the authenticated user's saved schema.
-- `PUT /api/schemas/current`: validate and save the authenticated user's schema.
+
+Request body:
+
+```json
+{
+  "url": "https://api.example.com/users",
+  "method": "GET",
+  "headers": {
+    "authorization": "Bearer token"
+  },
+  "body": null
+}
+```
+
+Supported methods are `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, and `OPTIONS`.
+
+The route returns external API statuses inside the response payload instead of turning them into app-level HTTP errors. For example, an external `404` should be rendered in the Swagger Viewer response panel.
+
+The route records request analytics for authenticated users. Unauthenticated users can still execute requests, but history is not recorded.
+
+Routes/actions:
+
+- `POST /api/requests/execute`: execute external REST requests through the server and record
+  analytics.
+- Initial saved schema load can happen directly in the main Server Component page.
+- Schema saving can use a Server Action or `PUT /api/schemas/current`.
 - Server-rendered History pages will query Supabase directly from Server Components or server helpers.
 
 Authentication implementation should add Supabase session refresh to the existing Next proxy so cookies stay current during route changes.

@@ -36,6 +36,11 @@ export default async function Home({ params }: HomeProps) {
           >
             {t('secondaryAction')}
           </a>
+          {process.env.NODE_ENV === 'development' ? (
+            <a className={buttonVariants({ variant: 'ghost' })} href={`/${locale}/dev/swagger`}>
+              Dev smoke test
+            </a>
+          ) : null}
         </div>
       </section>
     </main>

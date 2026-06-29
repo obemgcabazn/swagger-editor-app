@@ -20,6 +20,7 @@ export default defineConfig({
         'src/components/app-shell/**',
         'src/i18n/navigation.ts',
         'src/i18n/request.ts',
+        'src/lib/requests/request-history.ts',
         'src/lib/supabase/database.types.ts',
         'src/lib/supabase/server.ts',
         'src/proxy.ts',
