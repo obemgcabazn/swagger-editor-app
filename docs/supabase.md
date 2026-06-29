@@ -8,18 +8,14 @@ Supabase is used for three project areas:
 
 ## Project Setup
 
-1. Create a Supabase project from the Supabase dashboard.
-2. Copy the project URL and anon/publishable key from **Project Settings > API**.
-3. Create a local `.env.local` file:
+- Add to `.env` from `.env.example`. Keys are publishebly openly - so .env.example have valid values
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL="https://your-project-ref.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-or-publishable-key"
+SUPABASE_DEV_USER_EMAIL="test@test.com"
+SUPABASE_DEV_USER_PASSWORD="test-pass"
 ```
-
-Do not commit `.env.local`. Use `.env.example` as the committed template.
-
-Do not put the Supabase `service_role` key in the app unless a future server-only admin task explicitly needs it. Current app flows should use the anon key with Row Level Security.
 
 ## Database Schema
 
@@ -36,7 +32,7 @@ It creates:
 
 All user-owned tables have Row Level Security enabled.
 
-## Applying The Schema
+## Applying The New Schemas
 
 Fast path through the dashboard:
 
@@ -60,16 +56,6 @@ npx supabase start
 npx supabase db reset
 ```
 
-## Team Access
-
-The project owner should invite teammates in the Supabase dashboard:
-
-1. Open **Project Settings > Team**.
-2. Invite teammates by email.
-3. Give them enough access to view project API settings, Auth, Table Editor, SQL Editor, and logs.
-
-Each teammate should create their own `.env.local` with the shared project URL and anon/publishable key. These values are safe to use in browser-capable code when RLS is correctly configured, but they still should not be committed.
-
 ## App Access Pattern
 
 Default pattern:
@@ -86,15 +72,43 @@ Use server-side Supabase calls for:
 - Recording request analytics from the proxy route.
 - Rendering History and Analytics pages.
 
-Do not add a browser Supabase client by default. Add one only if a feature needs realtime subscriptions or another client-only Supabase capability.
+We did not add a browser Supabase client. Add will add only if a feature needs realtime subscriptions or another client-only Supabase capability.
+
+## Temporary Development Sign-In
+
+Until the real authentication UI is implemented, a development-only route can sign in a manually created Supabase user:
+
+```text
+POST /api/dev/sign-in
+```
+
+Setup:
+
+1. In the Supabase dashboard, create a test user in **Authentication > Users**.
+2. Add the credentials to local `.env` or `.env.local`:
+
+```bash
+SUPABASE_DEV_USER_EMAIL="test@test.com"
+SUPABASE_DEV_USER_PASSWORD="test-pass"
+```
+
+3. Start the app in development and call:
+
+```bash
+curl -i -X POST http://localhost:3000/api/dev/sign-in
+```
+
+The route uses normal Supabase Auth and sets real Supabase session cookies, so RLS-protected schema/history work can be tested before the real auth screens exist.
+
+The route returns `404` outside `NODE_ENV=development` and should not be used as production authentication.
 
 ## Planned App Contracts
 
 Recommended future routes/actions:
 
-- `POST /api/proxy`: execute external REST requests through the server and record analytics.
+- `POST /api/requests/execute`: execute external REST requests through the server and record analytics.
 - `GET /api/schemas/current`: load the authenticated user's saved schema.
 - `PUT /api/schemas/current`: validate and save the authenticated user's schema.
-- Server-rendered History pages should query Supabase directly from Server Components or server helpers.
+- Server-rendered History pages will query Supabase directly from Server Components or server helpers.
 
 Authentication implementation should add Supabase session refresh to the existing Next proxy so cookies stay current during route changes.
