@@ -7,17 +7,17 @@ import { updateSession } from './lib/supabase/proxy';
 const intlMiddleware = createMiddleware(routing);
 
 export async function proxy(request: NextRequest) {
-  const supabaseRespose = await updateSession(request);
+  const supabaseResponse = await updateSession(request);
   const intlResponse = intlMiddleware(request);
 
   if (intlResponse) {
-    supabaseRespose.cookies.getAll().forEach((cookie) => {
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
       intlResponse.cookies.set(cookie.name, cookie.value);
     });
     return intlResponse;
   }
 
-  return supabaseRespose;
+  return supabaseResponse;
 }
 
 export const config = {
