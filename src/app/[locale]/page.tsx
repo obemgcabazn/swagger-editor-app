@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { buttonVariants } from '@/components/ui/button';
+import { Link } from '@/i18n/navigation';
 
 type HomeProps = Readonly<{
   params: Promise<{ locale: string }>;
@@ -25,9 +26,9 @@ export default async function Home({ params }: HomeProps) {
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
-          <a className={buttonVariants()} href={`/${locale}`}>
+          <Link className={buttonVariants()} href="/editor">
             {t('primaryAction')}
-          </a>
+          </Link>
           <a
             className={buttonVariants({ variant: 'outline' })}
             href="https://swagger.io/specification/"
@@ -37,9 +38,9 @@ export default async function Home({ params }: HomeProps) {
             {t('secondaryAction')}
           </a>
           {process.env.NODE_ENV === 'development' ? (
-            <a className={buttonVariants({ variant: 'ghost' })} href={`/${locale}/dev/swagger`}>
+            <Link className={buttonVariants({ variant: 'ghost' })} href="/dev/swagger">
               Dev smoke test
-            </a>
+            </Link>
           ) : null}
         </div>
       </section>
