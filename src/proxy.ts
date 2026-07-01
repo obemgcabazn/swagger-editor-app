@@ -1,25 +1,43 @@
 import createMiddleware from 'next-intl/middleware';
-import { type NextRequest } from 'next/server';
+import { type NextRequest, type NextResponse } from 'next/server';
 
 import { routing } from './i18n/routing';
 import { updateSession } from './lib/supabase/proxy';
 
 const intlMiddleware = createMiddleware(routing);
 
+// Headers Supabase @supabase/ssr writes via setAll(cacheHeaders) on session refresh.
+const SUPABASE_SESSION_CACHE_HEADERS = new Set(['cache-control', 'expires', 'pragma']);
+
+/** Merge Supabase session refresh output into the next-intl proxy response without clobbering intl headers. */
+export function mergeSupabaseSessionIntoIntlResponse(
+  supabaseResponse: NextResponse,
+  intlResponse: NextResponse
+) {
+  for (const cookie of supabaseResponse.cookies.getAll()) {
+    intlResponse.cookies.set(cookie);
+  }
+
+  for (const [name, value] of supabaseResponse.headers) {
+    if (SUPABASE_SESSION_CACHE_HEADERS.has(name.toLowerCase())) {
+      intlResponse.headers.set(name, value);
+    }
+  }
+}
+
 export async function proxy(request: NextRequest) {
-  const supabaseRespose = await updateSession(request);
+  const supabaseResponse = await updateSession(request);
   const intlResponse = intlMiddleware(request);
 
   if (intlResponse) {
-    supabaseRespose.cookies.getAll().forEach((cookie) => {
-      intlResponse.cookies.set(cookie.name, cookie.value);
-    });
+    mergeSupabaseSessionIntoIntlResponse(supabaseResponse, intlResponse);
     return intlResponse;
   }
 
-  return supabaseRespose;
+  return supabaseResponse;
 }
 
+// we exlude api routes, since i18n route mathcing can be expensive for every api call
 export const config = {
   matcher: '/((?!api|trpc|_next|_vercel|.*\\..*).*)',
 };
