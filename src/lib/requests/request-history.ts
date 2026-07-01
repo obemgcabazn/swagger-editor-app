@@ -1,7 +1,7 @@
 import 'server-only';
 
 import type { Json } from '@/lib/supabase/database.types';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient, getAuthClaims } from '@/lib/supabase/server';
 
 import type { ExecuteRequestResult } from './execute-request';
 
@@ -22,16 +22,13 @@ export async function recordRequestHistory(
   result: ExecuteRequestResult
 ): Promise<RequestHistoryRecordStatus> {
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  const claims = await getAuthClaims(supabase);
 
-  if (userError || !user) {
+  if (!claims?.sub) {
     return { reason: 'unauthenticated', recorded: false };
   }
 
-  const { error } = await supabase.from('request_history').insert({
+  const { error: insertError } = await supabase.from('request_history').insert({
     duration_ms: result.response?.durationMs ?? null,
     endpoint_url: result.request.url,
     error_details: result.error?.message ?? null,
@@ -41,19 +38,19 @@ export async function recordRequestHistory(
     response_headers: (result.response?.headers ?? null) as Json | null,
     response_size_bytes: result.response?.bodySizeBytes ?? null,
     status_code: result.response?.status ?? null,
-    user_id: user.id,
+    user_id: claims.sub,
   });
 
-  if (error) {
+  if (insertError) {
     return {
       // keeping additional internal supabase error details for development
       ...(process.env.NODE_ENV === 'development'
         ? {
             error: {
-              code: error.code,
-              details: error.details,
-              hint: error.hint,
-              message: error.message,
+              code: insertError.code,
+              details: insertError.details,
+              hint: insertError.hint,
+              message: insertError.message,
             },
           }
         : {}),
