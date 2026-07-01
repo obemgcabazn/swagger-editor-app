@@ -6,10 +6,10 @@ import { updateSession } from './lib/supabase/proxy';
 
 const intlMiddleware = createMiddleware(routing);
 
-// Headers Supabase @supabase/ssr writes via setAll(cacheHeaders) on session refresh.
+// Headers Supabase @supabase/ssr writes via setAll(cacheHeaders) on session refresh - copy them so CDN won't cache auth responses.
 const SUPABASE_SESSION_CACHE_HEADERS = new Set(['cache-control', 'expires', 'pragma']);
 
-/** Merge Supabase session refresh output into the next-intl proxy response without clobbering intl headers. */
+// Merge Supabase session refresh output into the next-intl proxy response without overriding intl headers.
 export function mergeSupabaseSessionIntoIntlResponse(
   supabaseResponse: NextResponse,
   intlResponse: NextResponse
