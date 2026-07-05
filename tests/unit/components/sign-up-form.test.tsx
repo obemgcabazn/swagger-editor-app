@@ -6,6 +6,10 @@ vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
 }));
 
+vi.mock('@/app/[locale]/(auth)/actions', () => ({
+  signUpAction: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { SignUpForm } from '@/app/[locale]/sign-up/sign-up-form';
 
 describe('SignUpForm', () => {

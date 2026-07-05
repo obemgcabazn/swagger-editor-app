@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signUpSchema, type SignUpInput } from '@/lib/validation/auth';
 import { useTranslations } from 'next-intl';
+import { signUpAction } from '@/app/[locale]/(auth)/actions';
 
 export function SignUpForm() {
   const {
@@ -17,9 +19,20 @@ export function SignUpForm() {
     resolver: zodResolver(signUpSchema),
     mode: 'onChange',
   });
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
   const t = useTranslations('Auth');
 
-  const onSubmit = (data: SignUpInput) => console.log(data);
+  const onSubmit = (data: SignUpInput) => {
+    setServerError(null);
+    startTransition(async () => {
+      const result = await signUpAction(data);
+      if (result?.error) {
+        setServerError(result.error);
+      }
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -47,7 +60,12 @@ export function SignUpForm() {
       <Input id="sign-up-password-confirm" type="password" {...register('passwordConfirm')} />
       <p>{errors.passwordConfirm?.message && t(`${errors.passwordConfirm.message}`)}</p>
 
-      <Button type="submit" className="mt-5">
+      {serverError && (
+        <p role="alert" className="text-destructive mt-4">
+          {t(serverError)}
+        </p>
+      )}
+      <Button type="submit" className="mt-5" disabled={isPending}>
         {t('signUpButton')}
       </Button>
     </form>
