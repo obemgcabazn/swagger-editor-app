@@ -9,20 +9,20 @@ describe('getSupabaseEnv', () => {
 
   it('returns configured Supabase environment variables', () => {
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://example.supabase.co');
-    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon-key');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY', 'sb_publishable_test');
 
     expect(getSupabaseEnv()).toEqual({
-      supabaseAnonKey: 'anon-key',
+      supabasePublishableKey: 'sb_publishable_test',
       supabaseUrl: 'https://example.supabase.co',
     });
   });
 
   it('throws a readable error when variables are missing', () => {
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', '');
-    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', '');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY', '');
 
     expect(() => getSupabaseEnv()).toThrow(
-      'Missing Supabase environment variables: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY'
+      'Missing Supabase environment variables: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY'
     );
   });
 });

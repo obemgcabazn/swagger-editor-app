@@ -12,7 +12,7 @@ Supabase is used for three project areas:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL="https://your-project-ref.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-or-publishable-key"
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="your-supabase-publishable-key"
 SUPABASE_DEV_USER_EMAIL="test@test.com"
 SUPABASE_DEV_USER_PASSWORD="test-pass"
 ```
@@ -62,6 +62,7 @@ Default pattern:
 
 ```text
 Server Component / Route Handler / Server Action -> Supabase server client
+Client Component (auth UI only) -> Supabase browser client
 ```
 
 Use server-side Supabase calls for:
@@ -72,7 +73,17 @@ Use server-side Supabase calls for:
 - Recording request analytics from the request execution route.
 - Rendering History and Analytics pages.
 
-We did not add a browser Supabase client. Add will add only if a feature needs realtime subscriptions or another client-only Supabase capability.
+Use the browser client (`src/lib/supabase/client.ts`) only for client-side auth flows:
+
+- Login and sign-up forms (`signInWithPassword`, OAuth).
+- `onAuthStateChange` for header/session UI state.
+- Realtime subscriptions, if added later.
+
+Database reads and writes stay on the server so RLS remains the security boundary.
+
+## Session Refresh
+
+Supabase session refresh runs in `src/proxy.ts` via `updateSession()` on page navigations. Cookies stay current during route changes. API route handlers refresh sessions through `createSupabaseServerClient()` when needed.
 
 ## Temporary Development Sign-In
 
@@ -151,5 +162,3 @@ Routes/actions:
 - Initial saved schema load can happen directly in the main Server Component page.
 - Schema saving can use a Server Action or `PUT /api/schemas/current`.
 - Server-rendered History pages will query Supabase directly from Server Components or server helpers.
-
-Authentication implementation should add Supabase session refresh to the existing Next proxy so cookies stay current during route changes.

@@ -12,7 +12,21 @@
     "history": "История",
     "signOut": "Выйти",
     "signIn": "Войти",
-    "signUp": "Регистрация"
+    "signUp": "Регистрация",
+    "signUpButton": "Зарегистрироваться",
+    "signInButton": "Войти",
+    "name": "Имя",
+    "password": "Пароль",
+    "passwordConfirm": "Повторите пароль",
+    "name_too_short": "Имя должно содержать не менее 3 букв",
+    "name_too_long": "Имя должно быть не более 100 символов",
+    "invalid_email": "Email введен не верно",
+    "password_required": "Требуется ввести пароль",
+    "password_dont_match": "Введенные пароли не совпадают",
+    "password_too_short": "Пароль должен содержать минимум 8 символов",
+    "password_needs_letter": "Пароль должен содержать хотя бы одну букву",
+    "password_needs_digit": "Пароль должен содержать хотя бы одну цифру",
+    "password_needs_special": "Пароль должен содержать хотя бы один специальный символ"
   },
   "SwaggerEditor": {
     "title": "Swagger редактор",

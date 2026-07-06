@@ -1,7 +1,7 @@
 export function getSupabaseEnv() {
   const requiredServerEnv = [
     ['NEXT_PUBLIC_SUPABASE_URL', process.env.NEXT_PUBLIC_SUPABASE_URL],
-    ['NEXT_PUBLIC_SUPABASE_ANON_KEY', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY],
+    ['NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY', process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY],
   ] as const;
 
   const missingKeys = requiredServerEnv.filter(([, value]) => !value).map(([key]) => key);
@@ -11,10 +11,10 @@ export function getSupabaseEnv() {
   }
 
   return {
-    supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    supabasePublishableKey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
   } as {
-    supabaseAnonKey: string;
+    supabasePublishableKey: string;
     supabaseUrl: string;
   };
 }
