@@ -76,6 +76,7 @@ export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProp
   const [headers, setHeaders] = useState<Array<{ key: string; value: string }>>([]);
   const [pathParams, setPathParams] = useState<Record<string, string>>({});
   const [queryParams, setQueryParams] = useState<Record<string, string>>({});
+  const [cookieParams, setCookieParams] = useState<Record<string, string>>({});
   const [body, setBody] = useState(() =>
     getDefaultBody(endpoint.requestBody?.content?.['application/json']?.schema)
   );
@@ -114,6 +115,16 @@ export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProp
     for (const { key, value } of headers) {
       if (key.trim()) reqHeaders[key.trim()] = value;
     }
+
+    const cookieValues = Object.entries(cookieParams)
+      .filter(([, v]) => v.trim())
+      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+      .join('; ');
+
+    if (cookieValues) {
+      reqHeaders['cookie'] = cookieValues;
+    }
+
     if (hasBody && body.trim()) reqHeaders['content-type'] = 'application/json';
 
     try {
@@ -212,10 +223,33 @@ export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProp
         </div>
       )}
 
+      {params.filter((p) => p.in === 'cookie').length > 0 && (
+        <div className="space-y-2">
+          <span className="text-muted-foreground text-xs font-medium">{t('cookieParams')}</span>
+          {params
+            .filter((p) => p.in === 'cookie')
+            .map((p) => (
+              <div className="flex items-center gap-2" key={p.name}>
+                <Label className="min-w-[6rem] text-xs">{p.name}</Label>
+                <Input
+                  className="h-7 text-xs"
+                  value={cookieParams[p.name] ?? ''}
+                  onChange={(e) =>
+                    setCookieParams((prev) => ({ ...prev, [p.name]: e.target.value }))
+                  }
+                  placeholder={p.required ? 'required' : 'optional'}
+                />
+              </div>
+            ))}
+        </div>
+      )}
+
       <div className="space-y-2">
         <span className="text-muted-foreground text-xs font-medium">{t('headers')}</span>
         {headers
-          .filter((h) => !params.some((p) => p.in === 'header' && p.name === h.key))
+          .filter(
+            (h) => !params.some((p) => (p.in === 'header' || p.in === 'cookie') && p.name === h.key)
+          )
           .map((h, i) => (
             <div className="flex items-center gap-2" key={`custom-${i}`}>
               <Input

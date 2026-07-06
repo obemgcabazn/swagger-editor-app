@@ -50,7 +50,8 @@
     "sending": "Sending...",
     "copyCurl": "cURL",
     "copied": "Copied",
-    "responses": "Responses"
+    "responses": "Responses",
+    "cookieParams": "Cookie parameters"
   },
   "Error": {
     "title": "Something went wrong",

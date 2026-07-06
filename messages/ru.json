@@ -50,7 +50,8 @@
     "sending": "Отправка...",
     "copyCurl": "cURL",
     "copied": "Скопировано",
-    "responses": "Ответы"
+    "responses": "Ответы",
+    "cookieParams": "Cookie параметры"
   },
   "Error": {
     "title": "Что-то пошло не так",
