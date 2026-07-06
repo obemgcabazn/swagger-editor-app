@@ -37,7 +37,6 @@ export async function proxy(request: NextRequest) {
   return supabaseResponse;
 }
 
-// we exlude api routes, since i18n route mathcing can be expensive for every api call
 export const config = {
   matcher: '/((?!api|trpc|_next|_vercel|.*\\..*).*)',
 };

@@ -1,9 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
+}));
+
+const mockSignInAction = vi.fn();
+vi.mock('@/app/[locale]/(auth)/actions', () => ({
+  signInAction: (...args: unknown[]) => mockSignInAction(...args),
 }));
 
 import { SignInForm } from '@/app/[locale]/sign-in/sign-in-form';
@@ -59,6 +64,43 @@ describe('SignInForm', () => {
         expect(screen.queryByText('invalid_email')).not.toBeInTheDocument();
         expect(screen.getByText('password_required')).toBeInTheDocument();
       });
+    });
+  });
+
+  describe('server submission', () => {
+    afterEach(() => {
+      mockSignInAction.mockReset();
+    });
+
+    it('shows the returned error as a root alert when signInAction fails', async () => {
+      mockSignInAction.mockResolvedValue({ error: 'invalid_credentials' });
+      const user = userEvent.setup();
+      render(<SignInForm />);
+
+      await user.type(screen.getByPlaceholderText('john@email.com'), 'ada@example.com');
+      await user.type(screen.getByLabelText('password'), 'wrong-password');
+      await user.click(screen.getByRole('button', { name: 'signInButton' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toHaveTextContent('invalid_credentials');
+      });
+      expect(mockSignInAction).toHaveBeenCalledWith({
+        email: 'ada@example.com',
+        password: 'wrong-password',
+      });
+    });
+
+    it('shows no root alert when signInAction succeeds', async () => {
+      mockSignInAction.mockResolvedValue(undefined);
+      const user = userEvent.setup();
+      render(<SignInForm />);
+
+      await user.type(screen.getByPlaceholderText('john@email.com'), 'ada@example.com');
+      await user.type(screen.getByLabelText('password'), 'correct-password');
+      await user.click(screen.getByRole('button', { name: 'signInButton' }));
+
+      await waitFor(() => expect(mockSignInAction).toHaveBeenCalledOnce());
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
   });
 });

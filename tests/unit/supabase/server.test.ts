@@ -22,11 +22,57 @@ vi.mock('@/lib/supabase/env', () => ({
 
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
-import { getAuthClaims, getAuthenticatedUser } from '@/lib/supabase/server';
+import {
+  createSupabaseServerClient,
+  getAuthClaims,
+  getAuthenticatedUser,
+} from '@/lib/supabase/server';
 
 function setupCookieStore() {
   vi.mocked(cookies).mockResolvedValue({ getAll: vi.fn(() => []), set: vi.fn() } as never);
 }
+
+describe('createSupabaseServerClient cookie adapter', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('proxies getAll() to the cookie store', async () => {
+    const getAll = vi.fn(() => [{ name: 'a', value: '1' }]);
+    vi.mocked(cookies).mockResolvedValue({ getAll, set: vi.fn() } as never);
+
+    await createSupabaseServerClient();
+
+    const options = vi.mocked(createServerClient).mock.calls[0][2]!;
+    expect(options.cookies!.getAll()).toEqual([{ name: 'a', value: '1' }]);
+  });
+
+  it('writes each cookie via cookieStore.set() when it succeeds (Server Action/Route Handler)', async () => {
+    const set = vi.fn();
+    vi.mocked(cookies).mockResolvedValue({ getAll: vi.fn(() => []), set } as never);
+
+    await createSupabaseServerClient();
+
+    const options = vi.mocked(createServerClient).mock.calls[0][2]!;
+    options.cookies!.setAll!([{ name: 'sb-token', value: 'abc', options: { path: '/' } }], {});
+
+    expect(set).toHaveBeenCalledWith('sb-token', 'abc', { path: '/' });
+  });
+
+  it('swallows the error when cookieStore.set() throws (Server Component context)', async () => {
+    const set = vi.fn(() => {
+      throw new Error('Cookies can only be modified in a Server Action or Route Handler');
+    });
+    vi.mocked(cookies).mockResolvedValue({ getAll: vi.fn(() => []), set } as never);
+
+    await createSupabaseServerClient();
+
+    const options = vi.mocked(createServerClient).mock.calls[0][2]!;
+    expect(() =>
+      options.cookies!.setAll!([{ name: 'sb-token', value: 'abc', options: {} }], {})
+    ).not.toThrow();
+  });
+});
 
 describe('getAuthClaims', () => {
   afterEach(() => {

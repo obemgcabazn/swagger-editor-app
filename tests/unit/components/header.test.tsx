@@ -66,4 +66,16 @@ describe('Header', () => {
 
     expect(screen.getByText('ada@example.com')).toBeInTheDocument();
   });
+
+  it('renders no name element when both name and email are absent', async () => {
+    mockGetAuthClaims.mockResolvedValue({
+      sub: 'user-3',
+      user_metadata: {},
+    });
+
+    const { container } = render(await Header());
+
+    expect(screen.getByText('Auth.signOut')).toBeInTheDocument();
+    expect(container.querySelector('span')).not.toBeInTheDocument();
+  });
 });

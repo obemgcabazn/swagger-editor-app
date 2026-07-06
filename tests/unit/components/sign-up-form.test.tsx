@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
@@ -10,7 +10,17 @@ vi.mock('@/app/[locale]/(auth)/actions', () => ({
   signUpAction: vi.fn().mockResolvedValue(undefined),
 }));
 
+import { signUpAction } from '@/app/[locale]/(auth)/actions';
 import { SignUpForm } from '@/app/[locale]/sign-up/sign-up-form';
+
+const mockSignUpAction = vi.mocked(signUpAction);
+
+async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(screen.getByPlaceholderText('John'), 'Ada');
+  await user.type(screen.getByPlaceholderText('john@email.com'), 'ada@example.com');
+  await user.type(screen.getByLabelText('password'), 'Password1!');
+  await user.type(screen.getByLabelText('passwordConfirm'), 'Password1!');
+}
 
 describe('SignUpForm', () => {
   describe('rendering', () => {
@@ -172,6 +182,54 @@ describe('SignUpForm', () => {
         expect(screen.queryByText('password_too_short')).not.toBeInTheDocument();
         expect(screen.queryByText('password_dont_match')).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe('server submission', () => {
+    afterEach(() => {
+      mockSignUpAction.mockReset().mockResolvedValue(undefined as never);
+    });
+
+    it('shows the returned error as a root alert when signUpAction fails', async () => {
+      mockSignUpAction.mockResolvedValue({ error: 'user_already_exists' });
+      const user = userEvent.setup();
+      render(<SignUpForm />);
+
+      await fillValidForm(user);
+      await user.click(screen.getByRole('button', { name: 'signUpButton' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toHaveTextContent('user_already_exists');
+      });
+    });
+
+    it('clears a previous server error once resubmitted', async () => {
+      mockSignUpAction.mockResolvedValueOnce({ error: 'user_already_exists' });
+      const user = userEvent.setup();
+      render(<SignUpForm />);
+
+      await fillValidForm(user);
+      await user.click(screen.getByRole('button', { name: 'signUpButton' }));
+      await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+
+      mockSignUpAction.mockResolvedValueOnce(undefined as never);
+      await user.click(screen.getByRole('button', { name: 'signUpButton' }));
+
+      await waitFor(() => {
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      });
+    });
+
+    it('shows no root alert when signUpAction succeeds', async () => {
+      mockSignUpAction.mockResolvedValue(undefined as never);
+      const user = userEvent.setup();
+      render(<SignUpForm />);
+
+      await fillValidForm(user);
+      await user.click(screen.getByRole('button', { name: 'signUpButton' }));
+
+      await waitFor(() => expect(mockSignUpAction).toHaveBeenCalledOnce());
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
   });
 });
