@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { generateCurlCommand } from '@/lib/swagger/curl-generator';
+import { buildRequestHeaders } from '@/lib/swagger/request-headers';
 
 type Param = { in: string; name: string; required?: boolean };
 
@@ -107,25 +108,15 @@ export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProp
 
   const url = buildUrl();
 
+  const requestHeaders = buildRequestHeaders({
+    contentType: hasBody && body.trim() ? 'application/json' : null,
+    cookieParams,
+    headers,
+  });
+
   const execute = async () => {
     setLoading(true);
     setResponse(null);
-
-    const reqHeaders: Record<string, string> = {};
-    for (const { key, value } of headers) {
-      if (key.trim()) reqHeaders[key.trim()] = value;
-    }
-
-    const cookieValues = Object.entries(cookieParams)
-      .filter(([, v]) => v.trim())
-      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-      .join('; ');
-
-    if (cookieValues) {
-      reqHeaders['cookie'] = cookieValues;
-    }
-
-    if (hasBody && body.trim()) reqHeaders['content-type'] = 'application/json';
 
     try {
       const res = await fetch('/api/requests/execute', {
@@ -134,7 +125,7 @@ export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProp
         body: JSON.stringify({
           method: endpoint.method,
           url,
-          headers: reqHeaders,
+          headers: requestHeaders,
           body: hasBody ? body : null,
         }),
       });
@@ -146,12 +137,7 @@ export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProp
     }
   };
 
-  const curl = generateCurlCommand(
-    endpoint.method,
-    url,
-    Object.fromEntries(headers.filter((h) => h.key.trim()).map((h) => [h.key, h.value])),
-    hasBody ? body : null
-  );
+  const curl = generateCurlCommand(endpoint.method, url, requestHeaders, hasBody ? body : null);
 
   return (
     <div className="space-y-4">
