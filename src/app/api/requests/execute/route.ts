@@ -21,10 +21,14 @@ export async function POST(request: Request) {
   }
 
   const result = await executeExternalRequest(parsed.data);
-  const analytics = await recordRequestHistory(result);
+  try {
+    const analytics = await recordRequestHistory(result);
 
-  return NextResponse.json({
-    analytics,
-    ...result,
-  });
+    return NextResponse.json({
+      analytics,
+      ...result,
+    });
+  } catch {
+    return NextResponse.json(result);
+  }
 }
