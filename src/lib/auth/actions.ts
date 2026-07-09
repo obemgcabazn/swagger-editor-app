@@ -1,9 +1,13 @@
 'use server';
 
-import { redirect } from 'next/navigation';
+import { redirect } from '@/i18n/navigation';
 import { getLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { signInSchema, signUpSchema, type SignInInput, type SignUpInput } from '@/lib/auth/schemas';
+
+async function redirectHome() {
+  redirect({ href: '/', locale: await getLocale() });
+}
 
 export async function signInAction(input: SignInInput) {
   const parsed = signInSchema.safeParse(input);
@@ -19,8 +23,7 @@ export async function signInAction(input: SignInInput) {
     return { error: 'invalid_credentials' as const };
   }
 
-  const locale = await getLocale();
-  redirect(`/${locale}`);
+  redirectHome();
 }
 
 export async function signUpAction(input: SignUpInput) {
@@ -48,14 +51,12 @@ export async function signUpAction(input: SignUpInput) {
     return { error: 'sign_up_error' as const };
   }
 
-  const locale = await getLocale();
-  redirect(`/${locale}`);
+  redirectHome();
 }
 
 export async function signOutAction() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
 
-  const locale = await getLocale();
-  redirect(`/${locale}`);
+  redirectHome();
 }
