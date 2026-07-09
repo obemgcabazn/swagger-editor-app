@@ -66,14 +66,14 @@ describe('signInAction', () => {
     expect(mockRedirect).not.toHaveBeenCalled();
   });
 
-  it('signs in and redirects home on success', async () => {
+  it('signs in and returns success without redirecting', async () => {
     mockSignInWithPassword.mockResolvedValue({ error: null });
-    mockGetLocale.mockResolvedValue('en');
 
-    await signInAction(VALID_SIGN_IN);
+    const result = await signInAction(VALID_SIGN_IN);
 
+    expect(result).toEqual({ success: true });
     expect(mockSignInWithPassword).toHaveBeenCalledWith(VALID_SIGN_IN);
-    expect(mockRedirect).toHaveBeenCalledWith({ href: '/', locale: 'en' });
+    expect(mockRedirect).not.toHaveBeenCalled();
   });
 });
 
@@ -115,18 +115,18 @@ describe('signUpAction', () => {
     expect(result).toEqual({ error: 'sign_up_error' });
   });
 
-  it('signs up with the parsed name in user metadata and redirects home on success', async () => {
+  it('signs up with the parsed name in user metadata and returns success without redirecting', async () => {
     mockSignUp.mockResolvedValue({ error: null });
-    mockGetLocale.mockResolvedValue('ru');
 
-    await signUpAction(VALID_SIGN_UP);
+    const result = await signUpAction(VALID_SIGN_UP);
 
+    expect(result).toEqual({ success: true });
     expect(mockSignUp).toHaveBeenCalledWith({
       email: VALID_SIGN_UP.email,
       password: VALID_SIGN_UP.password,
       options: { data: { name: VALID_SIGN_UP.name } },
     });
-    expect(mockRedirect).toHaveBeenCalledWith({ href: '/', locale: 'ru' });
+    expect(mockRedirect).not.toHaveBeenCalled();
   });
 });
 

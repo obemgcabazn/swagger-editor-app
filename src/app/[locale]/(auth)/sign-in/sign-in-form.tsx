@@ -1,6 +1,5 @@
 'use client';
 
-import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,27 +7,32 @@ import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signInAction } from '@/lib/auth/actions';
 import { signInSchema, type SignInInput } from '@/lib/auth/schemas';
+import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 
 export function SignInForm() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
+    clearErrors,
     setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<SignInInput>({
     resolver: zodResolver(signInSchema),
   });
-  const [isPending, startTransition] = useTransition();
   const t = useTranslations('Auth');
 
-  const onSubmit = (data: SignInInput) => {
-    startTransition(async () => {
-      const result = await signInAction(data);
-      if (result?.error) {
-        setError('root', { message: result.error });
-      }
-    });
+  const onSubmit = async (data: SignInInput) => {
+    clearErrors('root');
+    const result = await signInAction(data);
+    if (result?.error) {
+      setError('root', { message: result.error });
+      return;
+    }
+
+    router.replace('/');
+    router.refresh();
   };
 
   return (
@@ -50,8 +54,11 @@ export function SignInForm() {
           {t(errors.root.message ?? '')}
         </p>
       )}
-      <Button type="submit" className="mt-5" disabled={isPending}>
-        {t('signInButton')}
+      <Button type="submit" className="mt-5" disabled={isSubmitting}>
+        {isSubmitting && (
+          <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        )}
+        <span>{isSubmitting ? t('signInPending') : t('signInButton')}</span>
       </Button>
     </form>
   );

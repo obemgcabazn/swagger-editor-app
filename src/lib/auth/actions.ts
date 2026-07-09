@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { signInSchema, signUpSchema, type SignInInput, type SignUpInput } from '@/lib/auth/schemas';
 
 async function redirectHome() {
+  // next-intl 4.* requires to pass locale explicitly in redirect() server calls
   redirect({ href: '/', locale: await getLocale() });
 }
 
@@ -23,7 +24,7 @@ export async function signInAction(input: SignInInput) {
     return { error: 'invalid_credentials' as const };
   }
 
-  redirectHome();
+  return { success: true as const };
 }
 
 export async function signUpAction(input: SignUpInput) {
@@ -51,7 +52,7 @@ export async function signUpAction(input: SignUpInput) {
     return { error: 'sign_up_error' as const };
   }
 
-  redirectHome();
+  return { success: true as const };
 }
 
 export async function signOutAction() {
