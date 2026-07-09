@@ -31,6 +31,7 @@ export default defineConfig({
         'src/i18n/navigation.ts',
         'src/i18n/request.ts',
         'src/lib/supabase/database.types.ts',
+        'src/lib/supabase/client.ts',
         'src/proxy.ts',
       ],
       thresholds: {
