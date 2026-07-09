@@ -78,4 +78,18 @@ describe('Header', () => {
     expect(screen.getByText('Auth.signOut')).toBeInTheDocument();
     expect(container.querySelector('span')).not.toBeInTheDocument();
   });
+
+  it('renders a sign-out form with a submit button when signed in', async () => {
+    mockGetAuthClaims.mockResolvedValue({
+      sub: 'user-1',
+      email: 'ada@example.com',
+      user_metadata: { name: 'Ada' },
+    });
+
+    render(await Header());
+
+    const signOutButton = screen.getByRole('button', { name: 'Auth.signOut' });
+    expect(signOutButton).toHaveAttribute('type', 'submit');
+    expect(signOutButton.closest('form')).not.toBeNull();
+  });
 });
