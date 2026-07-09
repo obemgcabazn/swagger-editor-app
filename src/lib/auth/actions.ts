@@ -3,12 +3,7 @@
 import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import {
-  signInSchema,
-  signUpSchema,
-  type SignInInput,
-  type SignUpInput,
-} from '@/lib/validation/auth';
+import { signInSchema, signUpSchema, type SignInInput, type SignUpInput } from '@/lib/auth/schemas';
 
 export async function signInAction(input: SignInInput) {
   const parsed = signInSchema.safeParse(input);

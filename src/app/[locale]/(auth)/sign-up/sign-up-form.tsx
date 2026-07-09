@@ -6,9 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signUpSchema, type SignUpInput } from '@/lib/validation/auth';
+import { signUpAction } from '@/lib/auth/actions';
+import { signUpSchema, type SignUpInput } from '@/lib/auth/schemas';
 import { useTranslations } from 'next-intl';
-import { signUpAction } from '@/app/[locale]/(auth)/actions';
 
 export function SignUpForm() {
   const {

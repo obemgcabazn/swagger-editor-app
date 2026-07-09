@@ -33,7 +33,7 @@ vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: mockCreateSupabaseServerClient,
 }));
 
-import { signInAction, signOutAction, signUpAction } from '@/app/[locale]/(auth)/actions';
+import { signInAction, signOutAction, signUpAction } from '@/lib/auth/actions';
 
 const VALID_SIGN_IN = { email: 'ada@example.com', password: 'anypassword' };
 const VALID_SIGN_UP = {

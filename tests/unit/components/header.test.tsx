@@ -18,7 +18,7 @@ vi.mock('@/components/app-shell/language-switcher', () => ({
   LanguageSwitcher: () => null,
 }));
 
-vi.mock('@/app/[locale]/(auth)/actions', () => ({
+vi.mock('@/lib/auth/actions', () => ({
   signOutAction: vi.fn(),
 }));
 

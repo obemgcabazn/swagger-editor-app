@@ -7,11 +7,11 @@ vi.mock('next-intl', () => ({
 }));
 
 const mockSignInAction = vi.fn();
-vi.mock('@/app/[locale]/(auth)/actions', () => ({
+vi.mock('@/lib/auth/actions', () => ({
   signInAction: (...args: unknown[]) => mockSignInAction(...args),
 }));
 
-import { SignInForm } from '@/app/[locale]/sign-in/sign-in-form';
+import { SignInForm } from '@/app/[locale]/(auth)/sign-in/sign-in-form';
 
 describe('SignInForm', () => {
   describe('rendering', () => {

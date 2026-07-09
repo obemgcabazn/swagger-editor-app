@@ -6,12 +6,12 @@ vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock('@/app/[locale]/(auth)/actions', () => ({
+vi.mock('@/lib/auth/actions', () => ({
   signUpAction: vi.fn().mockResolvedValue(undefined),
 }));
 
-import { signUpAction } from '@/app/[locale]/(auth)/actions';
-import { SignUpForm } from '@/app/[locale]/sign-up/sign-up-form';
+import { signUpAction } from '@/lib/auth/actions';
+import { SignUpForm } from '@/app/[locale]/(auth)/sign-up/sign-up-form';
 
 const mockSignUpAction = vi.mocked(signUpAction);
 

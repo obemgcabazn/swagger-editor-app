@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 
-import { signOutAction } from '@/app/[locale]/(auth)/actions';
+import { signOutAction } from '@/lib/auth/actions';
 import { buttonVariants } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { getAuthClaims } from '@/lib/supabase/server';
