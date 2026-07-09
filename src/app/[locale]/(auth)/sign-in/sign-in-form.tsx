@@ -43,10 +43,10 @@ export function SignInForm() {
       <Input id="sign-in-email" type="email" placeholder="john@email.com" {...register('email')} />
       <p>{errors.email?.message && t(`${errors.email.message}`)}</p>
 
-      <Label className="mt-5 mb-2 cursor-pointer" htmlFor="sign-up-password">
+      <Label className="mt-5 mb-2 cursor-pointer" htmlFor="sign-in-password">
         {t('password')}
       </Label>
-      <Input id="sign-up-password" type="password" {...register('password')} />
+      <Input id="sign-in-password" type="password" {...register('password')} />
       <p>{errors.password?.message && t(`${errors.password.message}`)}</p>
 
       {errors.root && (
