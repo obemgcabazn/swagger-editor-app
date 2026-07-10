@@ -69,11 +69,9 @@
     "copyright": "Создано для RS School.",
     "description": "Редактор и просмотрщик Swagger/OpenAPI, REST-клиент и история запросов в одном локализованном приложении."
   },
-  "HomePage": {
-    "title": "Swagger Editor App",
-    "description": "Вставляйте, редактируйте, просматривайте и тестируйте OpenAPI-спецификации в одном интерфейсе.",
-    "primaryAction": "Начать редактирование",
-    "secondaryAction": "Открыть документацию"
+  "HistoryPage": {
+    "title": "История запросов",
+    "description": "Здесь будут отображаться выполненные API-запросы. Страница скоро появится."
   },
   "Metadata": {
     "title": "Swagger Editor App",
@@ -87,6 +85,7 @@
   "Navigation": {
     "about": "О проекте",
     "brand": "Swagger Editor App",
+    "history": "История",
     "language": "Язык",
     "main": "Главная"
   }

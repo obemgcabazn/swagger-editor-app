@@ -1,5 +1,8 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
+import { buttonVariants } from '@/components/ui/button';
+import { Link } from '@/i18n/navigation';
+
 type AboutPageProps = Readonly<{
   params: Promise<{ locale: string }>;
 }>;
@@ -29,6 +32,11 @@ export default async function AboutPage({ params }: AboutPageProps) {
             <p className="text-muted-foreground mt-2 text-sm leading-6">{t('techDescription')}</p>
           </article>
         </div>
+        {process.env.NODE_ENV === 'development' ? (
+          <Link className={buttonVariants({ variant: 'ghost' })} href="/dev/swagger">
+            Dev smoke test
+          </Link>
+        ) : null}
       </section>
     </main>
   );

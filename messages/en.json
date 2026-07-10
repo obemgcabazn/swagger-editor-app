@@ -69,11 +69,9 @@
     "copyright": "Built for RS School.",
     "description": "Swagger/OpenAPI editor, viewer, REST client, and request history in one localized application."
   },
-  "HomePage": {
-    "title": "Swagger Editor App",
-    "description": "Paste, edit, view, and test OpenAPI specifications from one interface.",
-    "primaryAction": "Start editing",
-    "secondaryAction": "Read documentation"
+  "HistoryPage": {
+    "title": "Request history",
+    "description": "Your executed API requests will appear here. This page is coming soon."
   },
   "Metadata": {
     "title": "Swagger Editor App",
@@ -87,6 +85,7 @@
   "Navigation": {
     "about": "About",
     "brand": "Swagger Editor App",
+    "history": "History",
     "language": "Language",
     "main": "Main"
   }
