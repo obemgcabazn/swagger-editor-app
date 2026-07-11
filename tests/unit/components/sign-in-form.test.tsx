@@ -6,14 +6,29 @@ vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
 }));
 
+const mockReplace = vi.fn();
+const mockRefresh = vi.fn();
+vi.mock('@/i18n/navigation', () => ({
+  useRouter: () => ({
+    replace: mockReplace,
+    refresh: mockRefresh,
+  }),
+}));
+
 const mockSignInAction = vi.fn();
-vi.mock('@/app/[locale]/(auth)/actions', () => ({
+vi.mock('@/lib/auth/actions', () => ({
   signInAction: (...args: unknown[]) => mockSignInAction(...args),
 }));
 
-import { SignInForm } from '@/app/[locale]/sign-in/sign-in-form';
+import { SignInForm } from '@/app/[locale]/(auth)/sign-in/sign-in-form';
 
 describe('SignInForm', () => {
+  afterEach(() => {
+    mockSignInAction.mockReset();
+    mockReplace.mockReset();
+    mockRefresh.mockReset();
+  });
+
   describe('rendering', () => {
     it('renders the email input', () => {
       render(<SignInForm />);
@@ -68,10 +83,6 @@ describe('SignInForm', () => {
   });
 
   describe('server submission', () => {
-    afterEach(() => {
-      mockSignInAction.mockReset();
-    });
-
     it('shows the returned error as a root alert when signInAction fails', async () => {
       mockSignInAction.mockResolvedValue({ error: 'invalid_credentials' });
       const user = userEvent.setup();
@@ -90,8 +101,8 @@ describe('SignInForm', () => {
       });
     });
 
-    it('shows no root alert when signInAction succeeds', async () => {
-      mockSignInAction.mockResolvedValue(undefined);
+    it('shows validation_error when the server rejects the payload', async () => {
+      mockSignInAction.mockResolvedValue({ error: 'validation_error' });
       const user = userEvent.setup();
       render(<SignInForm />);
 
@@ -99,8 +110,50 @@ describe('SignInForm', () => {
       await user.type(screen.getByLabelText('password'), 'correct-password');
       await user.click(screen.getByRole('button', { name: 'signInButton' }));
 
-      await waitFor(() => expect(mockSignInAction).toHaveBeenCalledOnce());
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toHaveTextContent('validation_error');
+      });
+    });
+
+    it('navigates home when signInAction succeeds', async () => {
+      mockSignInAction.mockResolvedValue({ success: true });
+      const user = userEvent.setup();
+      render(<SignInForm />);
+
+      await user.type(screen.getByPlaceholderText('john@email.com'), 'ada@example.com');
+      await user.type(screen.getByLabelText('password'), 'correct-password');
+      await user.click(screen.getByRole('button', { name: 'signInButton' }));
+
+      await waitFor(() => {
+        expect(mockSignInAction).toHaveBeenCalledOnce();
+        expect(mockReplace).toHaveBeenCalledWith('/');
+        expect(mockRefresh).toHaveBeenCalledOnce();
+      });
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('disables submit and shows pending label while signInAction is in flight', async () => {
+      let resolveAction!: (value: { success: true }) => void;
+      mockSignInAction.mockReturnValue(
+        new Promise((resolve) => {
+          resolveAction = resolve;
+        })
+      );
+      const user = userEvent.setup();
+      render(<SignInForm />);
+
+      await user.type(screen.getByPlaceholderText('john@email.com'), 'ada@example.com');
+      await user.type(screen.getByLabelText('password'), 'correct-password');
+      await user.click(screen.getByRole('button', { name: 'signInButton' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'signInPending' })).toBeDisabled();
+      });
+
+      resolveAction({ success: true });
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'signInButton' })).not.toBeDisabled();
+      });
     });
   });
 });

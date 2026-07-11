@@ -6,23 +6,45 @@ vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock('@/app/[locale]/(auth)/actions', () => ({
+const mockReplace = vi.fn();
+const mockRefresh = vi.fn();
+vi.mock('@/i18n/navigation', () => ({
+  useRouter: () => ({
+    replace: mockReplace,
+    refresh: mockRefresh,
+  }),
+}));
+
+vi.mock('@/lib/auth/actions', () => ({
   signUpAction: vi.fn().mockResolvedValue(undefined),
 }));
 
-import { signUpAction } from '@/app/[locale]/(auth)/actions';
-import { SignUpForm } from '@/app/[locale]/sign-up/sign-up-form';
+import { signUpAction } from '@/lib/auth/actions';
+import { SignUpForm } from '@/app/[locale]/(auth)/sign-up/sign-up-form';
 
 const mockSignUpAction = vi.mocked(signUpAction);
 
+const VALID_SIGN_UP = {
+  name: 'Ada',
+  email: 'ada@example.com',
+  password: 'Password1!',
+  passwordConfirm: 'Password1!',
+};
+
 async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
-  await user.type(screen.getByPlaceholderText('John'), 'Ada');
-  await user.type(screen.getByPlaceholderText('john@email.com'), 'ada@example.com');
-  await user.type(screen.getByLabelText('password'), 'Password1!');
-  await user.type(screen.getByLabelText('passwordConfirm'), 'Password1!');
+  await user.type(screen.getByPlaceholderText('John'), VALID_SIGN_UP.name);
+  await user.type(screen.getByPlaceholderText('john@email.com'), VALID_SIGN_UP.email);
+  await user.type(screen.getByLabelText('password'), VALID_SIGN_UP.password);
+  await user.type(screen.getByLabelText('passwordConfirm'), VALID_SIGN_UP.passwordConfirm);
 }
 
 describe('SignUpForm', () => {
+  afterEach(() => {
+    mockSignUpAction.mockReset().mockResolvedValue(undefined as never);
+    mockReplace.mockReset();
+    mockRefresh.mockReset();
+  });
+
   describe('rendering', () => {
     it('renders name, email, password, and passwordConfirm fields', () => {
       render(<SignUpForm />);
@@ -143,7 +165,6 @@ describe('SignUpForm', () => {
       it('shows password_dont_match when confirmation differs from password', async () => {
         const user = userEvent.setup();
         render(<SignUpForm />);
-        // password must be fully valid for the refine to run
         await user.type(screen.getByLabelText('password'), 'Password1!');
         await user.type(screen.getByLabelText('passwordConfirm'), 'Different1!');
 
@@ -170,10 +191,7 @@ describe('SignUpForm', () => {
     it('shows no errors when all fields contain valid data and submit is clicked', async () => {
       const user = userEvent.setup();
       render(<SignUpForm />);
-      await user.type(screen.getByPlaceholderText('John'), 'Ada');
-      await user.type(screen.getByPlaceholderText('john@email.com'), 'ada@example.com');
-      await user.type(screen.getByLabelText('password'), 'Password1!');
-      await user.type(screen.getByLabelText('passwordConfirm'), 'Password1!');
+      await fillValidForm(user);
       await user.click(screen.getByRole('button', { name: 'signUpButton' }));
 
       await waitFor(() => {
@@ -186,10 +204,6 @@ describe('SignUpForm', () => {
   });
 
   describe('server submission', () => {
-    afterEach(() => {
-      mockSignUpAction.mockReset().mockResolvedValue(undefined as never);
-    });
-
     it('shows the returned error as a root alert when signUpAction fails', async () => {
       mockSignUpAction.mockResolvedValue({ error: 'user_already_exists' });
       const user = userEvent.setup();
@@ -203,6 +217,19 @@ describe('SignUpForm', () => {
       });
     });
 
+    it('shows validation_error when the server rejects the payload', async () => {
+      mockSignUpAction.mockResolvedValue({ error: 'validation_error' });
+      const user = userEvent.setup();
+      render(<SignUpForm />);
+
+      await fillValidForm(user);
+      await user.click(screen.getByRole('button', { name: 'signUpButton' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toHaveTextContent('validation_error');
+      });
+    });
+
     it('clears a previous server error once resubmitted', async () => {
       mockSignUpAction.mockResolvedValueOnce({ error: 'user_already_exists' });
       const user = userEvent.setup();
@@ -212,7 +239,7 @@ describe('SignUpForm', () => {
       await user.click(screen.getByRole('button', { name: 'signUpButton' }));
       await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
 
-      mockSignUpAction.mockResolvedValueOnce(undefined as never);
+      mockSignUpAction.mockResolvedValueOnce({ success: true });
       await user.click(screen.getByRole('button', { name: 'signUpButton' }));
 
       await waitFor(() => {
@@ -220,16 +247,43 @@ describe('SignUpForm', () => {
       });
     });
 
-    it('shows no root alert when signUpAction succeeds', async () => {
-      mockSignUpAction.mockResolvedValue(undefined as never);
+    it('calls signUpAction with the parsed payload and navigates home on success', async () => {
+      mockSignUpAction.mockResolvedValue({ success: true });
       const user = userEvent.setup();
       render(<SignUpForm />);
 
       await fillValidForm(user);
       await user.click(screen.getByRole('button', { name: 'signUpButton' }));
 
-      await waitFor(() => expect(mockSignUpAction).toHaveBeenCalledOnce());
+      await waitFor(() => {
+        expect(mockSignUpAction).toHaveBeenCalledWith(VALID_SIGN_UP);
+        expect(mockReplace).toHaveBeenCalledWith('/');
+        expect(mockRefresh).toHaveBeenCalledOnce();
+      });
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('disables submit and shows pending label while signUpAction is in flight', async () => {
+      let resolveAction!: (value: { success: true }) => void;
+      mockSignUpAction.mockReturnValue(
+        new Promise((resolve) => {
+          resolveAction = resolve;
+        })
+      );
+      const user = userEvent.setup();
+      render(<SignUpForm />);
+
+      await fillValidForm(user);
+      await user.click(screen.getByRole('button', { name: 'signUpButton' }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'signUpPending' })).toBeDisabled();
+      });
+
+      resolveAction({ success: true });
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'signUpButton' })).not.toBeDisabled();
+      });
     });
   });
 });

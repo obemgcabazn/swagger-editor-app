@@ -28,11 +28,10 @@ export default defineConfig({
         'src/app/**/dev/**',
         'src/components/app-shell/app-shell.tsx',
         'src/components/app-shell/footer.tsx',
-        'src/components/app-shell/language-switcher.tsx',
         'src/i18n/navigation.ts',
         'src/i18n/request.ts',
-        'src/lib/requests/request-history.ts',
         'src/lib/supabase/database.types.ts',
+        'src/lib/supabase/client.ts',
         'src/proxy.ts',
       ],
       thresholds: {

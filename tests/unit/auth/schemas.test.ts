@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { signInSchema, signUpSchema } from '@/lib/validation/auth';
+import { signInSchema, signUpSchema } from '@/lib/auth/schemas';
 
 const VALID_SIGN_UP = {
   name: 'Ada',

@@ -27,13 +27,13 @@ const {
   };
 });
 
-vi.mock('next/navigation', () => ({ redirect: mockRedirect }));
+vi.mock('@/i18n/navigation', () => ({ redirect: mockRedirect }));
 vi.mock('next-intl/server', () => ({ getLocale: mockGetLocale }));
 vi.mock('@/lib/supabase/server', () => ({
   createSupabaseServerClient: mockCreateSupabaseServerClient,
 }));
 
-import { signInAction, signOutAction, signUpAction } from '@/app/[locale]/(auth)/actions';
+import { signInAction, signOutAction, signUpAction } from '@/lib/auth/actions';
 
 const VALID_SIGN_IN = { email: 'ada@example.com', password: 'anypassword' };
 const VALID_SIGN_UP = {
@@ -66,14 +66,14 @@ describe('signInAction', () => {
     expect(mockRedirect).not.toHaveBeenCalled();
   });
 
-  it('signs in and redirects to the current locale on success', async () => {
+  it('signs in and returns success without redirecting', async () => {
     mockSignInWithPassword.mockResolvedValue({ error: null });
-    mockGetLocale.mockResolvedValue('en');
 
-    await signInAction(VALID_SIGN_IN);
+    const result = await signInAction(VALID_SIGN_IN);
 
+    expect(result).toEqual({ success: true });
     expect(mockSignInWithPassword).toHaveBeenCalledWith(VALID_SIGN_IN);
-    expect(mockRedirect).toHaveBeenCalledWith('/en');
+    expect(mockRedirect).not.toHaveBeenCalled();
   });
 });
 
@@ -115,18 +115,18 @@ describe('signUpAction', () => {
     expect(result).toEqual({ error: 'sign_up_error' });
   });
 
-  it('signs up with the parsed name in user metadata and redirects on success', async () => {
+  it('signs up with the parsed name in user metadata and returns success without redirecting', async () => {
     mockSignUp.mockResolvedValue({ error: null });
-    mockGetLocale.mockResolvedValue('ru');
 
-    await signUpAction(VALID_SIGN_UP);
+    const result = await signUpAction(VALID_SIGN_UP);
 
+    expect(result).toEqual({ success: true });
     expect(mockSignUp).toHaveBeenCalledWith({
       email: VALID_SIGN_UP.email,
       password: VALID_SIGN_UP.password,
       options: { data: { name: VALID_SIGN_UP.name } },
     });
-    expect(mockRedirect).toHaveBeenCalledWith('/ru');
+    expect(mockRedirect).not.toHaveBeenCalled();
   });
 });
 
@@ -135,12 +135,12 @@ describe('signOutAction', () => {
     vi.clearAllMocks();
   });
 
-  it('signs out and redirects to the current locale', async () => {
+  it('signs out and redirects home', async () => {
     mockGetLocale.mockResolvedValue('en');
 
     await signOutAction();
 
     expect(mockSignOut).toHaveBeenCalledOnce();
-    expect(mockRedirect).toHaveBeenCalledWith('/en');
+    expect(mockRedirect).toHaveBeenCalledWith({ href: '/', locale: 'en' });
   });
 });

@@ -1,37 +1,39 @@
 'use client';
 
-import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signUpSchema, type SignUpInput } from '@/lib/validation/auth';
+import { signUpAction } from '@/lib/auth/actions';
+import { signUpSchema, type SignUpInput } from '@/lib/auth/schemas';
+import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { signUpAction } from '@/app/[locale]/(auth)/actions';
 
 export function SignUpForm() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    clearErrors,
+    setError,
+    formState: { errors, isSubmitting },
   } = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
     mode: 'onChange',
   });
-  const [serverError, setServerError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-
   const t = useTranslations('Auth');
 
-  const onSubmit = (data: SignUpInput) => {
-    setServerError(null);
-    startTransition(async () => {
-      const result = await signUpAction(data);
-      if (result?.error) {
-        setServerError(result.error);
-      }
-    });
+  const onSubmit = async (data: SignUpInput) => {
+    clearErrors('root');
+    const result = await signUpAction(data);
+    if (result?.error) {
+      setError('root', { message: result.error });
+      return;
+    }
+
+    router.replace('/');
+    router.refresh();
   };
 
   return (
@@ -60,13 +62,16 @@ export function SignUpForm() {
       <Input id="sign-up-password-confirm" type="password" {...register('passwordConfirm')} />
       <p>{errors.passwordConfirm?.message && t(`${errors.passwordConfirm.message}`)}</p>
 
-      {serverError && (
+      {errors.root && (
         <p role="alert" className="text-destructive mt-4">
-          {t(serverError)}
+          {t(errors.root.message ?? '')}
         </p>
       )}
-      <Button type="submit" className="mt-5" disabled={isPending}>
-        {t('signUpButton')}
+      <Button type="submit" className="mt-5" disabled={isSubmitting}>
+        {isSubmitting && (
+          <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        )}
+        <span>{isSubmitting ? t('signUpPending') : t('signUpButton')}</span>
       </Button>
     </form>
   );
