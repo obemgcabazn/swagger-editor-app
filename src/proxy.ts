@@ -1,5 +1,5 @@
 import createMiddleware from 'next-intl/middleware';
-import { type NextRequest, type NextResponse } from 'next/server';
+import type { NextRequest, NextResponse } from 'next/server';
 
 import { routing } from './i18n/routing';
 import { updateSession } from './lib/supabase/proxy';
@@ -37,7 +37,6 @@ export async function proxy(request: NextRequest) {
   return supabaseResponse;
 }
 
-// we exlude api routes, since i18n route mathcing can be expensive for every api call
 export const config = {
   matcher: '/((?!api|trpc|_next|_vercel|.*\\..*).*)',
 };

@@ -1,7 +1,9 @@
 import { getTranslations } from 'next-intl/server';
 
+import { signOutAction } from '@/lib/auth/actions';
 import { buttonVariants } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
+import { getAuthClaims } from '@/lib/supabase/server';
 
 import { LanguageSwitcher } from './language-switcher';
 
@@ -11,6 +13,7 @@ type GuestActionsProps = Readonly<{
 }>;
 
 type AuthenticatedActionsProps = Readonly<{
+  name: string | null;
   historyLabel: string;
   signOutLabel: string;
 }>;
@@ -28,28 +31,36 @@ function GuestActions({ signInLabel, signUpLabel }: GuestActionsProps) {
   );
 }
 
-function AuthenticatedActions({ historyLabel, signOutLabel }: AuthenticatedActionsProps) {
+function AuthenticatedActions({ name, historyLabel, signOutLabel }: AuthenticatedActionsProps) {
   return (
     <>
+      {name && <span className="text-muted-foreground text-sm">{name}</span>}
       <Link className={buttonVariants({ variant: 'ghost', size: 'sm' })} href="/history">
         {historyLabel}
       </Link>
-      <button className={buttonVariants({ size: 'sm' })} type="button">
-        {signOutLabel}
-      </button>
+      <form action={signOutAction}>
+        <button className={buttonVariants({ size: 'sm' })} type="submit">
+          {signOutLabel}
+        </button>
+      </form>
     </>
   );
 }
 
 async function getHeaderAuthState() {
-  // Supabase session lookup will replace this when authentication lands.
-  return { isAuthenticated: false };
+  const claims = await getAuthClaims();
+  if (!claims) {
+    return { isAuthenticated: false as const, name: null };
+  }
+
+  const name = (claims.user_metadata?.name as string | undefined) ?? claims.email ?? null;
+  return { isAuthenticated: true as const, name };
 }
 
 export async function Header() {
   const navigation = await getTranslations('Navigation');
   const auth = await getTranslations('Auth');
-  const { isAuthenticated } = await getHeaderAuthState();
+  const { isAuthenticated, name } = await getHeaderAuthState();
 
   return (
     <header className="sticky-header">
@@ -61,7 +72,11 @@ export async function Header() {
           <div className="flex items-center gap-2">
             <LanguageSwitcher label={navigation('language')} />
             {isAuthenticated ? (
-              <AuthenticatedActions historyLabel={auth('history')} signOutLabel={auth('signOut')} />
+              <AuthenticatedActions
+                name={name}
+                historyLabel={auth('history')}
+                signOutLabel={auth('signOut')}
+              />
             ) : (
               <GuestActions signInLabel={auth('signIn')} signUpLabel={auth('signUp')} />
             )}
