@@ -1,4 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+
+import { redirectIfAuthenticated } from '@/lib/auth/require-auth';
+
 import { SignUpForm } from './sign-up-form';
 
 type SignUpPageProps = Readonly<{
@@ -8,6 +11,7 @@ type SignUpPageProps = Readonly<{
 export default async function SignUpPage({ params }: SignUpPageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await redirectIfAuthenticated();
   const t = await getTranslations('Auth');
 
   return (

@@ -38,6 +38,7 @@ describe('Header', () => {
     expect(screen.getByText('Auth.signIn')).toBeInTheDocument();
     expect(screen.getByText('Auth.signUp')).toBeInTheDocument();
     expect(screen.queryByText('Auth.signOut')).not.toBeInTheDocument();
+    expect(screen.queryByText('Navigation.history')).not.toBeInTheDocument();
   });
 
   it('shows the user name, History link, and Sign Out when signed in', async () => {
@@ -50,7 +51,9 @@ describe('Header', () => {
     render(await Header());
 
     expect(screen.getByText('Ada')).toBeInTheDocument();
-    expect(screen.getByText('Auth.history')).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Primary' })).toHaveTextContent(
+      'Navigation.history'
+    );
     expect(screen.getByText('Auth.signOut')).toBeInTheDocument();
     expect(screen.queryByText('Auth.signIn')).not.toBeInTheDocument();
   });

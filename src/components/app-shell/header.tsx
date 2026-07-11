@@ -14,7 +14,6 @@ type GuestActionsProps = Readonly<{
 
 type AuthenticatedActionsProps = Readonly<{
   name: string | null;
-  historyLabel: string;
   signOutLabel: string;
 }>;
 
@@ -31,13 +30,10 @@ function GuestActions({ signInLabel, signUpLabel }: GuestActionsProps) {
   );
 }
 
-function AuthenticatedActions({ name, historyLabel, signOutLabel }: AuthenticatedActionsProps) {
+function AuthenticatedActions({ name, signOutLabel }: AuthenticatedActionsProps) {
   return (
     <>
       {name && <span className="text-muted-foreground text-sm">{name}</span>}
-      <Link className={buttonVariants({ variant: 'ghost', size: 'sm' })} href="/history">
-        {historyLabel}
-      </Link>
       <form action={signOutAction}>
         <button className={buttonVariants({ size: 'sm' })} type="submit">
           {signOutLabel}
@@ -72,11 +68,7 @@ export async function Header() {
           <div className="flex items-center gap-2">
             <LanguageSwitcher label={navigation('language')} />
             {isAuthenticated ? (
-              <AuthenticatedActions
-                name={name}
-                historyLabel={auth('history')}
-                signOutLabel={auth('signOut')}
-              />
+              <AuthenticatedActions name={name} signOutLabel={auth('signOut')} />
             ) : (
               <GuestActions signInLabel={auth('signIn')} signUpLabel={auth('signUp')} />
             )}
@@ -86,6 +78,14 @@ export async function Header() {
           <Link className="text-muted-foreground hover:text-foreground transition-colors" href="/">
             {navigation('main')}
           </Link>
+          {isAuthenticated ? (
+            <Link
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              href="/history"
+            >
+              {navigation('history')}
+            </Link>
+          ) : null}
           <Link
             className="text-muted-foreground hover:text-foreground transition-colors"
             href="/about"
