@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   formatBytes,
   formatDurationMs,
+  formatRequestSize,
   formatStatusCode,
   formatTimestamp,
 } from '@/lib/requests/format-analytics';
@@ -32,6 +33,16 @@ describe('formatBytes', () => {
 
   it('formats kilobytes', () => {
     expect(formatBytes(1536)).toBe('1.5 KB');
+  });
+});
+
+describe('formatRequestSize', () => {
+  it('returns the no-body label for null', () => {
+    expect(formatRequestSize(null, 'No body')).toBe('No body');
+  });
+
+  it('formats byte values when present', () => {
+    expect(formatRequestSize(14, 'No body')).toBe('14 B');
   });
 });
 

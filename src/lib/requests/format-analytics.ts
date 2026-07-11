@@ -35,6 +35,14 @@ export function formatBytes(bytes: number | null): string {
   return `${formatted} ${units[unitIndex]}`;
 }
 
+export function formatRequestSize(bytes: number | null, noBodyLabel: string): string {
+  if (bytes === null) {
+    return noBodyLabel;
+  }
+
+  return formatBytes(bytes);
+}
+
 export function formatTimestamp(iso: string, locale: string): string {
   return new Intl.DateTimeFormat(locale, {
     dateStyle: 'medium',

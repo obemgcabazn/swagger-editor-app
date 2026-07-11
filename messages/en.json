@@ -77,7 +77,21 @@
     "editorLink": "Go to Editor",
     "viewerLink": "Go to Viewer",
     "listSummary": "{count, plural, one {# request recorded} other {# requests recorded}}",
-    "viewDetails": "View details"
+    "viewDetails": "View details",
+    "backToHistory": "Back to history",
+    "detailTitle": "Request analytics",
+    "method": "Method",
+    "endpoint": "Endpoint / URL",
+    "statusCode": "Response status code",
+    "timestamp": "Request timestamp",
+    "duration": "Request duration",
+    "requestSize": "Request size",
+    "responseSize": "Response size",
+    "errorDetails": "Error details",
+    "noError": "None",
+    "noBody": "No body",
+    "requestHeaders": "Request headers",
+    "responseHeaders": "Response headers"
   },
   "Metadata": {
     "title": "Swagger Editor App",
