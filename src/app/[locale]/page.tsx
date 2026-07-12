@@ -1,5 +1,5 @@
 import { setRequestLocale } from 'next-intl/server';
-
+import { getAuthClaims } from '@/lib/supabase/server';
 import { SwaggerSection } from '@/components/swagger/swagger-section';
 
 type HomeProps = Readonly<{
@@ -8,8 +8,10 @@ type HomeProps = Readonly<{
 
 export default async function Home({ params }: HomeProps) {
   const { locale } = await params;
-
   setRequestLocale(locale);
 
-  return <SwaggerSection />;
+  const claims = await getAuthClaims();
+  const isAuthenticated = !!claims;
+
+  return <SwaggerSection isAuthenticated={isAuthenticated} />;
 }

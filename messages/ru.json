@@ -58,7 +58,9 @@
     "copyCurl": "cURL",
     "copied": "Скопировано",
     "responses": "Ответы",
-    "cookieParams": "Cookie параметры"
+    "cookieParams": "Cookie параметры",
+    "save": "Сохранить",
+    "saved": "Сохранено!"
   },
   "Error": {
     "title": "Что-то пошло не так",

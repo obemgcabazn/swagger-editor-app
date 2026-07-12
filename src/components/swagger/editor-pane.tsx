@@ -1,7 +1,9 @@
 'use client';
 
+import { Check, Save } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { SwaggerSchemaModel } from '@/hooks/use-swagger-schema';
 
@@ -10,10 +12,18 @@ import { EditorWorkspacePane, PaneBody, PaneToolbar } from './split-workspace';
 import { SwaggerEditor } from './swagger-editor';
 
 type EditorPaneProps = Readonly<{
+  isAuthenticated?: boolean;
   model: SwaggerSchemaModel;
+  onSave?: () => void;
+  saved?: boolean;
 }>;
 
-export function EditorPane({ model }: EditorPaneProps) {
+export function EditorPane({
+  isAuthenticated = false,
+  model,
+  onSave,
+  saved = false,
+}: EditorPaneProps) {
   const t = useTranslations('SwaggerEditor');
   const { content, format, status, toggleFormat, updateContent } = model;
 
@@ -27,6 +37,21 @@ export function EditorPane({ model }: EditorPaneProps) {
         </div>
         <div className="flex items-center gap-2">
           {status !== 'idle' && <EditorStatusBadge status={status} />}
+          {isAuthenticated && status === 'valid' && onSave && (
+            <Button size="xs" variant="ghost" onClick={onSave}>
+              {saved ? (
+                <>
+                  <Check className="size-3" />
+                  <span className="ml-1 hidden sm:inline">{t('saved')}</span>
+                </>
+              ) : (
+                <>
+                  <Save className="size-3" />
+                  <span className="ml-1 hidden sm:inline">{t('save')}</span>
+                </>
+              )}
+            </Button>
+          )}
           <FormatToggle
             currentFormat={format}
             disabled={status === 'idle'}

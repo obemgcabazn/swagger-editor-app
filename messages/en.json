@@ -58,7 +58,9 @@
     "copyCurl": "cURL",
     "copied": "Copied",
     "responses": "Responses",
-    "cookieParams": "Cookie parameters"
+    "cookieParams": "Cookie parameters",
+    "save": "Save",
+    "saved": "Saved!"
   },
   "Error": {
     "title": "Something went wrong",
