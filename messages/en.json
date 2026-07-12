@@ -71,7 +71,27 @@
   },
   "HistoryPage": {
     "title": "Request history",
-    "description": "Your executed API requests will appear here. This page is coming soon."
+    "description": "Review past API requests and performance metrics.",
+    "emptyMessage": "You haven't executed any requests yet.",
+    "emptyHint": "Use the REST client in the editor to send a request and start building your history.",
+    "editorLink": "Go to Editor",
+    "viewerLink": "Go to Viewer",
+    "listSummary": "{count, plural, one {# request recorded} other {# requests recorded}}",
+    "viewDetails": "View details",
+    "backToHistory": "Back to history",
+    "detailTitle": "Request analytics",
+    "method": "Method",
+    "endpoint": "Endpoint / URL",
+    "statusCode": "Response status code",
+    "timestamp": "Request timestamp",
+    "duration": "Request duration",
+    "requestSize": "Request size",
+    "responseSize": "Response size",
+    "errorDetails": "Error details",
+    "noError": "None",
+    "noBody": "No body",
+    "requestHeaders": "Request headers",
+    "responseHeaders": "Response headers"
   },
   "Metadata": {
     "title": "Swagger Editor App",

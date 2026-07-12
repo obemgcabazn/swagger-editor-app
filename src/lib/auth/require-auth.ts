@@ -9,7 +9,7 @@ export async function requireAuth() {
   const claims = await getAuthClaims();
 
   if (!claims) {
-    redirect({ href: '/sign-in', locale: await getLocale() });
+    redirect({ href: '/', locale: await getLocale() });
   }
 
   return claims;

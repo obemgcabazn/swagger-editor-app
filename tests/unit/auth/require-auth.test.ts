@@ -29,13 +29,13 @@ describe('requireAuth', () => {
     expect(mockRedirect).not.toHaveBeenCalled();
   });
 
-  it('redirects to sign-in when there are no claims', async () => {
+  it('redirects to main page when there are no claims', async () => {
     mockGetAuthClaims.mockResolvedValue(null);
     mockGetLocale.mockResolvedValue('en');
 
     await requireAuth();
 
-    expect(mockRedirect).toHaveBeenCalledWith({ href: '/sign-in', locale: 'en' });
+    expect(mockRedirect).toHaveBeenCalledWith({ href: '/', locale: 'en' });
   });
 });
 
