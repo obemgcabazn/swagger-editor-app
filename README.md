@@ -5,7 +5,7 @@ Localized Swagger/OpenAPI editor, viewer, and REST client for the [RS School Rea
 **Deployed app:** https://swagger-editor-app-indol.vercel.app  
 **Task:** [Swagger/OpenAPI UI](https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/final.md)  
 **Team:** Alex Freen, Aleksandr Khokhryakov, Palina Yarkevich  
-**YouTube video:** [cross-check PR #12](https://github.com/obemgcabazn/swagger-editor-app/pull/12)\_
+**YouTube video:** [cross-check PR #12](https://youtu.be/8Z52jtu0hek)
 
 ## Setup
 
