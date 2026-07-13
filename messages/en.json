@@ -1,10 +1,23 @@
 {
   "AboutPage": {
-    "courseDescription": "This project is part of the RS School React course and will be completed by a three-person team.",
+    "courseDescription": "RS School is a free, community-driven educational initiative by the Rolling Scopes community. This project is built as part of the React course — a hands-on program where students learn modern frontend development by building real applications in teams.",
+    "courseLink": "RS School React course",
     "courseTitle": "RS School course",
-    "description": "Learn what this Swagger/OpenAPI UI is for, which technologies it uses, and who is building it.",
     "eyebrow": "About the project",
-    "techDescription": "The app is built with Next.js App Router, next-intl, shadcn/ui, Tailwind CSS, TypeScript, and Supabase integration planned for auth and history.",
+    "githubLink": "GitHub",
+    "projectDescription": "Swagger Editor App is a localized web application for editing OpenAPI specifications, previewing API documentation, executing REST requests, and saving request history for authenticated users.",
+    "resourceOpenApi": "OpenAPI Specification",
+    "resourceRsSchool": "RS School",
+    "resourceRsSchoolReact": "RS School React course",
+    "resourceSwaggerEditor": "Swagger Editor",
+    "resourcesTitle": "Useful resources",
+    "roles": {
+      "developer": "Developer",
+      "teamLead": "Team Lead"
+    },
+    "teamDescription": "A three-person team building this project for the RS School React course.",
+    "teamTitle": "Development team",
+    "techDescription": "The application uses a modern React stack with static generation for public pages and Supabase for authentication and request history.",
     "techTitle": "Technology stack",
     "title": "About Swagger Editor App"
   },

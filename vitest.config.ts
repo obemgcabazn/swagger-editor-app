@@ -27,6 +27,8 @@ export default defineConfig({
         'src/app/**/dev/**',
         'src/components/app-shell/app-shell.tsx',
         'src/components/app-shell/footer.tsx',
+        // Static content data (team members, resource links) — no executable logic to test.
+        'src/content/**',
         'src/components/swagger/endpoint-list.tsx',
         'src/components/swagger/request-executor.tsx',
         'src/components/swagger/split-workspace.tsx',

@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { loadEnvConfig } from '@next/env';
+
 function loadEnvFile(filename: string) {
   const path = resolve(process.cwd(), filename);
   if (!existsSync(path)) {
@@ -26,8 +28,16 @@ function loadEnvFile(filename: string) {
   }
 }
 
-loadEnvFile('.env.local');
-loadEnvFile('.env');
+export function loadE2eEnv() {
+  loadEnvConfig(process.cwd());
+
+  // Playwright starts its own build/start process; fall back when .env.local is absent.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+    loadEnvFile('.env.example');
+  }
+}
+
+loadE2eEnv();
 
 export function getSupabaseDevCredentials() {
   return {

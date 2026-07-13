@@ -1,7 +1,6 @@
-import { loadEnvConfig } from '@next/env';
 import { expect, type Page } from '@playwright/test';
 
-loadEnvConfig(process.cwd());
+import { getSupabaseDevCredentials } from './helpers/env';
 
 const SAMPLE_REQUEST = {
   body: null,
@@ -11,12 +10,12 @@ const SAMPLE_REQUEST = {
 };
 
 export function hasDevCredentials() {
-  return Boolean(process.env.SUPABASE_DEV_USER_EMAIL && process.env.SUPABASE_DEV_USER_PASSWORD);
+  const { email, password } = getSupabaseDevCredentials();
+  return Boolean(email && password);
 }
 
 export function getDevCredentials() {
-  const email = process.env.SUPABASE_DEV_USER_EMAIL;
-  const password = process.env.SUPABASE_DEV_USER_PASSWORD;
+  const { email, password } = getSupabaseDevCredentials();
 
   if (!email || !password) {
     throw new Error(
