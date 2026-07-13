@@ -6,12 +6,12 @@ type PaneBodyProps = Readonly<{
 }>;
 
 export function SplitWorkspace({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:divide-x">{children}</div>;
+  return <div className="split-workspace">{children}</div>;
 }
 
 export function EditorWorkspacePane({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="flex h-[50vh] min-h-0 flex-col lg:h-auto lg:flex-1" id="editor">
+    <div className="split-workspace__editor" id="editor">
       {children}
     </div>
   );
@@ -19,10 +19,7 @@ export function EditorWorkspacePane({ children }: Readonly<{ children: React.Rea
 
 export function ViewerWorkspacePane({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div
-      className="flex min-h-0 flex-col overflow-auto border-t lg:flex-1 lg:border-t-0"
-      id="viewer"
-    >
+    <div className="split-workspace__viewer" id="viewer">
       {children}
     </div>
   );

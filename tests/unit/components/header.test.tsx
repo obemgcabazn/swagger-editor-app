@@ -30,6 +30,14 @@ vi.mock('@/lib/supabase/server', () => ({
 import { Header } from '@/components/app-shell/header';
 
 describe('Header', () => {
+  it('uses the shared app container for page alignment', async () => {
+    mockGetAuthClaims.mockResolvedValue(null);
+
+    const { container } = render(await Header());
+
+    expect(container.querySelector('.sticky-header__inner.app-container')).not.toBeNull();
+  });
+
   it('shows Sign In / Sign Up links and no name when signed out', async () => {
     mockGetAuthClaims.mockResolvedValue(null);
 

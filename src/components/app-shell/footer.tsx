@@ -8,7 +8,7 @@ export async function Footer() {
 
   return (
     <footer className="border-border/60 bg-muted/30 border-t">
-      <div className="text-muted-foreground mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-6 text-sm sm:px-6 lg:px-8">
+      <div className="app-container text-muted-foreground flex flex-col gap-4 py-6 text-sm">
         <div>
           <p className="text-foreground font-medium">{navigation('brand')}</p>
           <p className="mt-1 max-w-2xl">{footer('description')}</p>
