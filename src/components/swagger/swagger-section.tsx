@@ -16,19 +16,23 @@ export function SwaggerSection({ initialContent, isAuthenticated = false }: Swag
     useSwaggerSchema({ initialContent });
 
   return (
-    <main className="bg-background flex flex-1 flex-col">
-      <SplitWorkspace>
-        <EditorPane
-          content={content}
-          format={format}
-          isAuthenticated={isAuthenticated}
-          onChange={updateContent}
-          onLoad={loadContent}
-          onToggleFormat={toggleFormat}
-          schemaStatus={status}
-        />
-        <ViewerPane errors={errors} parsed={parsed} status={status} />
-      </SplitWorkspace>
+    <main className="bg-background flex min-h-0 flex-1 flex-col">
+      <div className="app-container flex min-h-0 flex-1 flex-col">
+        <div className="border-border flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border">
+          <SplitWorkspace>
+            <EditorPane
+              content={content}
+              format={format}
+              isAuthenticated={isAuthenticated}
+              onChange={updateContent}
+              onLoad={loadContent}
+              onToggleFormat={toggleFormat}
+              schemaStatus={status}
+            />
+            <ViewerPane errors={errors} parsed={parsed} status={status} />
+          </SplitWorkspace>
+        </div>
+      </div>
     </main>
   );
 }

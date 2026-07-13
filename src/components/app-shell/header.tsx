@@ -64,7 +64,7 @@ export async function Header() {
 
   return (
     <header className="sticky-header">
-      <div className="sticky-header__inner mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 sm:px-6 lg:px-8">
+      <div className="sticky-header__inner app-container flex flex-col gap-3">
         <div className="flex items-center justify-between gap-4">
           <Link className="text-foreground text-base font-semibold tracking-tight" href="/">
             {navigation('brand')}
