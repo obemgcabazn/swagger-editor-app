@@ -8,16 +8,26 @@ import { ViewerPane } from './viewer-pane';
 
 type SwaggerSectionProps = Readonly<{
   initialContent?: string;
+  isAuthenticated?: boolean;
 }>;
 
-export function SwaggerSection({ initialContent }: SwaggerSectionProps) {
-  const model = useSwaggerSchema({ initialContent });
+export function SwaggerSection({ initialContent, isAuthenticated = false }: SwaggerSectionProps) {
+  const { content, errors, format, loadContent, parsed, status, toggleFormat, updateContent } =
+    useSwaggerSchema({ initialContent });
 
   return (
     <main className="bg-background flex flex-1 flex-col">
       <SplitWorkspace>
-        <EditorPane model={model} />
-        <ViewerPane model={model} />
+        <EditorPane
+          content={content}
+          format={format}
+          isAuthenticated={isAuthenticated}
+          onChange={updateContent}
+          onLoad={loadContent}
+          onToggleFormat={toggleFormat}
+          schemaStatus={status}
+        />
+        <ViewerPane errors={errors} parsed={parsed} status={status} />
       </SplitWorkspace>
     </main>
   );

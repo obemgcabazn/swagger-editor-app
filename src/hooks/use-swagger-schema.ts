@@ -7,6 +7,7 @@ import { deriveSchemaModel, type SchemaModel } from '@/lib/swagger/schema-status
 import type { SchemaFormat } from '@/lib/swagger/types';
 
 export type SwaggerSchemaModel = SchemaModel & {
+  loadContent: (content: string, formatOverride?: SchemaFormat) => void;
   reset: () => void;
   toggleFormat: () => void;
   updateContent: (content: string) => void;
@@ -21,6 +22,10 @@ export function useSwaggerSchema({ initialContent = '' }: UseSwaggerSchemaOption
 
   const updateContent = useCallback((content: string) => {
     setModel(deriveSchemaModel(content));
+  }, []);
+
+  const loadContent = useCallback((content: string, formatOverride?: SchemaFormat) => {
+    setModel(deriveSchemaModel(content, formatOverride));
   }, []);
 
   const toggleFormat = useCallback(() => {
@@ -40,6 +45,7 @@ export function useSwaggerSchema({ initialContent = '' }: UseSwaggerSchemaOption
 
   return {
     ...model,
+    loadContent,
     reset,
     toggleFormat,
     updateContent,
