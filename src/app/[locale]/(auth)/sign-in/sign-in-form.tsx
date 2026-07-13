@@ -1,14 +1,14 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signInAction } from '@/lib/auth/actions';
 import { signInSchema, type SignInInput } from '@/lib/auth/schemas';
 import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
+
+import { AuthField } from '@/components/auth/auth-field';
+import { SubmitButton } from '@/components/auth/submit-button';
 
 export function SignInForm() {
   const router = useRouter();
@@ -37,29 +37,37 @@ export function SignInForm() {
 
   return (
     <form data-testid="sign-in-form" method="post" onSubmit={handleSubmit(onSubmit)}>
-      <Label className="mt-5 mb-2 cursor-pointer" htmlFor="sign-in-email">
-        Email
-      </Label>
-      <Input id="sign-in-email" type="email" placeholder="john@email.com" {...register('email')} />
-      <p>{errors.email?.message && t(`${errors.email.message}`)}</p>
+      <AuthField
+        error={errors.email?.message && t(errors.email.message)}
+        id="sign-in-email"
+        label="Email"
+        placeholder="john@email.com"
+        register={register('email')}
+        type="email"
+      />
 
-      <Label className="mt-5 mb-2 cursor-pointer" htmlFor="sign-in-password">
-        {t('password')}
-      </Label>
-      <Input id="sign-in-password" type="password" {...register('password')} />
-      <p>{errors.password?.message && t(`${errors.password.message}`)}</p>
+      <AuthField
+        error={errors.password?.message && t(errors.password.message)}
+        id="sign-in-password"
+        label={t('password')}
+        register={register('password')}
+        type="password"
+      />
 
-      {errors.root && (
-        <p role="alert" className="text-destructive mt-4">
-          {t(errors.root.message ?? '')}
-        </p>
-      )}
-      <Button data-testid="sign-in-submit" type="submit" className="mt-5" disabled={isSubmitting}>
-        {isSubmitting && (
-          <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      <div className="mt-4 min-h-5">
+        {errors.root && (
+          <p className="text-destructive text-sm" role="alert">
+            {t(errors.root.message ?? '')}
+          </p>
         )}
-        <span>{isSubmitting ? t('signInPending') : t('signInButton')}</span>
-      </Button>
+      </div>
+
+      <SubmitButton
+        data-testid="sign-in-submit"
+        idleLabel={t('signInButton')}
+        isSubmitting={isSubmitting}
+        pendingLabel={t('signInPending')}
+      />
     </form>
   );
 }
