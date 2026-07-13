@@ -1,37 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Swagger Editor App
 
-## Getting Started
+Localized Swagger/OpenAPI editor, viewer, and REST client for the [RS School React course](https://rs.school/courses/reactjs). Built with Next.js (App Router), `next-intl` (en/ru), and Supabase.
 
-First, run the development server:
+**Deployed app:** https://swagger-editor-app-indol.vercel.app  
+**Task:** [Swagger/OpenAPI UI](https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/final.md)  
+**Team:** Alex Freen, Aleksandr Khokhryakov, Palina Yarkevich  
+**YouTube video:** [cross-check PR #12](https://github.com/obemgcabazn/swagger-editor-app/pull/12)\_
+
+## Setup
 
 ```bash
-npm run dev
-# or
-pnpm dev
+npm install
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env.example` includes working Supabase keys for e2e tests. Optional `SUPABASE_DEV_USER_*` vars enable the dev sign-in route — see [docs/supabase.md](docs/supabase.md).
 
-You can start editing the main page by modifying `src/app/[locale]/page.tsx`. The page auto-updates as you edit the file.
+## Run
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev        # http://localhost:3000
+npm run build      # production build
+npm run start      # serve production build
+```
 
-## Supabase
+## Tests
 
-Supabase setup instructions, schema notes, and team access guidance are documented in
-[`docs/supabase.md`](docs/supabase.md).
+```bash
+npm test           # unit tests (Vitest)
+npm run test:watch # watch mode
+npm run coverage   # coverage report (80% threshold)
+```
 
-## Learn More
+## E2E
 
-To learn more about Next.js, take a look at the following resources:
+Playwright builds and starts the app automatically:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run test:e2e
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Uses `.env.local` when present; otherwise falls back to `.env.example`. If browsers are missing on first run, Playwright will prompt you to run `npx playwright install chromium`.
