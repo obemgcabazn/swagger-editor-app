@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import './tests/e2e/helpers/env';
+
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,

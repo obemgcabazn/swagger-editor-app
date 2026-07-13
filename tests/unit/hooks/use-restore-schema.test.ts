@@ -54,4 +54,41 @@ describe('useRestoreSchema', () => {
       expect(result.current.restoreStatus).toEqual({ phase: 'error', message: 'Unauthorized' });
     });
   });
+
+  it('does not fetch when the user is unauthenticated', () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    renderHook(() =>
+      useRestoreSchema({
+        isAuthenticated: false,
+        onLoad: vi.fn(),
+      })
+    );
+
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('skips onLoad when the saved schema is empty', async () => {
+    const onLoad = vi.fn();
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ content: '', format: 'yaml' }),
+      })
+    );
+
+    renderHook(() =>
+      useRestoreSchema({
+        isAuthenticated: true,
+        onLoad,
+      })
+    );
+
+    await waitFor(() => {
+      expect(onLoad).not.toHaveBeenCalled();
+    });
+  });
 });
