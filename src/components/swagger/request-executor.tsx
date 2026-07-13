@@ -8,12 +8,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
+import { SchemaToggle } from '@/components/swagger/schema-toggle';
 import { generateCurlCommand } from '@/lib/swagger/curl-generator';
+import { formatExecutionResult } from '@/lib/swagger/format-execution-result';
+import { getDefaultBody } from '@/lib/swagger/default-body';
+import {
+  formatSchemaDocument,
+  getRequestExample,
+  getRequestJsonContent,
+  getRequestSchema,
+  getResponseExample,
+  getResponseSchema,
+} from '@/lib/swagger/schema-documentation';
 import { buildRequestHeaders } from '@/lib/swagger/request-headers';
+import { getJsonBodyValidationError } from '@/lib/swagger/validate-json-body';
 
 type Param = { in: string; name: string; required?: boolean };
 
 type ResponseContent = {
+  example?: unknown;
+  examples?: Record<string, { value?: unknown }>;
   schema: Record<string, unknown>;
 };
 
@@ -25,38 +39,21 @@ type ResponseDef = {
 type EndpointDef = {
   method: string;
   parameters?: Param[];
-  requestBody?: { content?: Record<string, { schema: unknown }> };
+  requestBody?: {
+    content?: Record<
+      string,
+      { example?: unknown; examples?: Record<string, { value?: unknown }>; schema: unknown }
+    >;
+  };
   responses?: Record<string, ResponseDef>;
 };
 
 type RequestExecutorProps = Readonly<{
   baseUrl: string;
+  components?: { schemas?: Record<string, unknown> };
   endpoint: EndpointDef;
   path: string;
 }>;
-
-function getDefaultBody(schema: unknown): string {
-  if (!schema || typeof schema !== 'object') return '';
-
-  const s = schema as Record<string, unknown>;
-  if (s.example !== undefined) return JSON.stringify(s.example, null, 2);
-
-  if (s.type === 'object' && s.properties) {
-    const props = s.properties as Record<string, { type: string; example?: unknown }>;
-    const example: Record<string, unknown> = {};
-
-    for (const [key, prop] of Object.entries(props)) {
-      if (prop.example !== undefined) example[key] = prop.example;
-      else if (prop.type === 'string') example[key] = 'string';
-      else if (prop.type === 'number' || prop.type === 'integer') example[key] = 0;
-      else if (prop.type === 'boolean') example[key] = false;
-    }
-
-    return JSON.stringify(example, null, 2);
-  }
-
-  return '';
-}
 
 function StatusBadge({ code }: { code: string }) {
   const color = code.startsWith('2')
@@ -72,14 +69,14 @@ function StatusBadge({ code }: { code: string }) {
   return <span className={`rounded px-1.5 py-0.5 text-xs font-bold ${color}`}>{code}</span>;
 }
 
-export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProps) {
+export function RequestExecutor({ baseUrl, components, endpoint, path }: RequestExecutorProps) {
   const t = useTranslations('SwaggerEditor');
   const [headers, setHeaders] = useState<Array<{ key: string; value: string }>>([]);
   const [pathParams, setPathParams] = useState<Record<string, string>>({});
   const [queryParams, setQueryParams] = useState<Record<string, string>>({});
   const [cookieParams, setCookieParams] = useState<Record<string, string>>({});
   const [body, setBody] = useState(() =>
-    getDefaultBody(endpoint.requestBody?.content?.['application/json']?.schema)
+    getDefaultBody(endpoint.requestBody?.content?.['application/json'], components)
   );
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -88,6 +85,10 @@ export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProp
   const params = endpoint.parameters ?? [];
   const hasBody = endpoint.method !== 'GET' && endpoint.method !== 'HEAD' && !!endpoint.requestBody;
   const responses = endpoint.responses ?? {};
+  const bodyValidationError = hasBody ? getJsonBodyValidationError(body) : null;
+  const requestJsonContent = getRequestJsonContent(endpoint.requestBody);
+  const requestSchemaDoc = formatSchemaDocument(getRequestSchema(requestJsonContent, components));
+  const requestExampleDoc = formatSchemaDocument(getRequestExample(requestJsonContent, components));
 
   const buildUrl = () => {
     let url = `${baseUrl}${path}`;
@@ -115,6 +116,11 @@ export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProp
   });
 
   const execute = async () => {
+    if (bodyValidationError) {
+      setResponse(t('invalidJsonBody'));
+      return;
+    }
+
     setLoading(true);
     setResponse(null);
 
@@ -129,7 +135,7 @@ export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProp
           body: hasBody ? body : null,
         }),
       });
-      setResponse(JSON.stringify(await res.json(), null, 2));
+      setResponse(formatExecutionResult(await res.json()));
     } catch (err) {
       setResponse(err instanceof Error ? err.message : 'Request failed');
     } finally {
@@ -278,6 +284,12 @@ export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProp
 
       {hasBody && (
         <div className="space-y-2">
+          {requestSchemaDoc && (
+            <SchemaToggle content={requestSchemaDoc} label={t('requestSchema')} />
+          )}
+          {requestExampleDoc && (
+            <SchemaToggle content={requestExampleDoc} label={t('requestExample')} />
+          )}
           <span className="text-muted-foreground text-xs font-medium">{t('requestBody')}</span>
           <textarea
             className="border-border bg-background text-foreground w-full rounded-md border p-2 font-mono text-xs"
@@ -285,11 +297,14 @@ export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProp
             value={body}
             onChange={(e) => setBody(e.target.value)}
           />
+          {bodyValidationError && (
+            <p className="text-destructive text-xs">{t('invalidJsonBody')}</p>
+          )}
         </div>
       )}
 
       <div className="flex items-center gap-2">
-        <Button size="sm" disabled={loading} onClick={execute}>
+        <Button size="sm" disabled={loading || !!bodyValidationError} onClick={execute}>
           <Play className="size-3.5" />
           <span className="ml-1.5">{loading ? t('sending') : t('execute')}</span>
         </Button>
@@ -301,28 +316,63 @@ export function RequestExecutor({ baseUrl, endpoint, path }: RequestExecutorProp
 
       {Object.keys(responses).length > 0 && (
         <div className="space-y-2">
-          <span className="text-muted-foreground text-xs font-medium">{t('responses')}</span>
-          <div className="space-y-1">
-            {Object.entries(responses).map(([code, res]) => (
-              <div className="border-border rounded-md border px-3 py-2" key={code}>
-                <div className="flex items-center gap-2">
-                  <StatusBadge code={code} />
-                  <span className="text-muted-foreground text-xs">{res.description}</span>
-                </div>
-                {res.content?.['application/json']?.schema && (
-                  <pre className="bg-muted mt-2 overflow-auto rounded p-2 text-xs">
-                    {JSON.stringify(res.content['application/json'].schema, null, 2)}
-                  </pre>
-                )}
-              </div>
-            ))}
+          <span className="text-muted-foreground text-xs font-medium">
+            {t('documentedResponses')}
+          </span>
+          <div className="space-y-2">
+            {Object.entries(responses).map(([code, res]) => {
+              const responseSchemaDoc = formatSchemaDocument(getResponseSchema(res, components));
+              const responseExampleDoc = formatSchemaDocument(getResponseExample(res, components));
+
+              if (!responseSchemaDoc && !responseExampleDoc) return null;
+
+              return (
+                <SchemaToggle
+                  key={code}
+                  label={
+                    <>
+                      <StatusBadge code={code} />
+                      <span className="text-muted-foreground">{res.description}</span>
+                    </>
+                  }
+                >
+                  <div className="space-y-3">
+                    {responseSchemaDoc && (
+                      <div className="space-y-1">
+                        <span className="text-muted-foreground font-medium">
+                          {t('responseSchema')}
+                        </span>
+                        <pre className="overflow-auto whitespace-pre-wrap">{responseSchemaDoc}</pre>
+                      </div>
+                    )}
+                    {responseExampleDoc && (
+                      <div className="space-y-1">
+                        <span className="text-muted-foreground font-medium">
+                          {t('responseExample')}
+                        </span>
+                        <pre className="overflow-auto whitespace-pre-wrap">
+                          {responseExampleDoc}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                </SchemaToggle>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {response && (
-        <pre className="bg-muted max-h-96 overflow-auto rounded-md p-3 text-xs">{response}</pre>
-      )}
+      <div className="space-y-2">
+        <span className="text-muted-foreground text-xs font-medium">{t('executionResult')}</span>
+        <pre
+          className={`bg-muted max-h-96 min-h-24 overflow-auto rounded-md p-3 text-xs ${
+            !loading && !response ? 'text-muted-foreground' : ''
+          }`}
+        >
+          {loading ? t('sending') : (response ?? t('executionResultEmpty'))}
+        </pre>
+      </div>
     </div>
   );
 }
