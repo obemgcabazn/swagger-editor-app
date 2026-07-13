@@ -65,7 +65,7 @@ export default async function AboutPage({ params }: AboutPageProps) {
             <p className="text-muted-foreground text-sm leading-6">{t('courseDescription')}</p>
             <a
               className="text-foreground mt-4 inline-flex text-sm font-medium underline-offset-4 hover:underline"
-              href="https://rs.school/courses/react"
+              href="https://rs.school/courses/reactjs"
               rel="noopener noreferrer"
               target="_blank"
             >
