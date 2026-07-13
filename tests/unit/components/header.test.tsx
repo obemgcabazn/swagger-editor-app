@@ -12,6 +12,7 @@ vi.mock('@/i18n/navigation', () => ({
       {children}
     </a>
   ),
+  usePathname: () => '/',
 }));
 
 vi.mock('@/components/app-shell/language-switcher', () => ({
@@ -59,9 +60,7 @@ describe('Header', () => {
     render(await Header());
 
     expect(screen.getByText('Ada')).toBeInTheDocument();
-    expect(screen.getByRole('navigation', { name: 'Primary' })).toHaveTextContent(
-      'Navigation.history'
-    );
+    expect(screen.getByRole('link', { name: 'Navigation.history' })).toBeInTheDocument();
     expect(screen.getByText('Auth.signOut')).toBeInTheDocument();
     expect(screen.queryByText('Auth.signIn')).not.toBeInTheDocument();
   });

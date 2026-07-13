@@ -12,6 +12,7 @@ vi.mock('@/i18n/navigation', () => ({
       {children}
     </a>
   ),
+  usePathname: () => '/',
 }));
 
 import { Footer } from '@/components/app-shell/footer';

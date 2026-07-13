@@ -109,6 +109,9 @@ export function EndpointList({ schema }: EndpointListProps) {
               <div className="border-border bg-muted/20 border-x border-b px-4 py-3">
                 <RequestExecutor
                   baseUrl={baseUrl}
+                  components={
+                    schema.components as { schemas?: Record<string, unknown> } | undefined
+                  }
                   endpoint={{
                     method: ep.method,
                     parameters: ep.parameters,

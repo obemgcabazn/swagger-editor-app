@@ -24,6 +24,7 @@ export default defineConfig({
         'src/app/**/layout.tsx',
         'src/app/**/not-found.tsx',
         'src/app/**/error.tsx',
+        'src/app/**/loading.tsx',
         'src/app/**/dev/**',
         'src/components/app-shell/app-shell.tsx',
         'src/components/app-shell/footer.tsx',
