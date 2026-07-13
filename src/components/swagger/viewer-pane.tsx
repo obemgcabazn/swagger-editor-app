@@ -2,18 +2,19 @@
 
 import { useTranslations } from 'next-intl';
 
-import type { SwaggerSchemaModel } from '@/hooks/use-swagger-schema';
+import type { SchemaStatus } from '@/lib/swagger/schema-status';
 
 import { PaneBody, PaneToolbar, ViewerWorkspacePane } from './split-workspace';
 import { ViewerContent } from './viewer-content';
 
 type ViewerPaneProps = Readonly<{
-  model: SwaggerSchemaModel;
+  errors: string[];
+  parsed: Record<string, unknown> | null;
+  status: SchemaStatus;
 }>;
 
-export function ViewerPane({ model }: ViewerPaneProps) {
+export function ViewerPane({ errors, parsed, status }: ViewerPaneProps) {
   const t = useTranslations('SwaggerEditor');
-  const { errors, parsed, status } = model;
 
   return (
     <ViewerWorkspacePane>

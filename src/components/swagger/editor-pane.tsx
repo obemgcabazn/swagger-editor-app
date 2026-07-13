@@ -1,91 +1,58 @@
 'use client';
 
-import { Check, Save } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useEffect, useRef } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import type { SwaggerSchemaModel } from '@/hooks/use-swagger-schema';
+import type { SchemaFormat } from '@/lib/swagger/types';
+import type { SchemaStatus } from '@/lib/swagger/schema-status';
 
-import { FormatToggle } from './format-toggle';
-import { EditorWorkspacePane, PaneBody, PaneToolbar } from './split-workspace';
-import { SwaggerEditor } from './swagger-editor';
+import { EditorBody } from './editor-body';
+import { EditorToolbar } from './editor-toolbar';
+import { EditorWorkspacePane } from './split-workspace';
 
 type EditorPaneProps = Readonly<{
+  content: string;
+  format: SchemaFormat;
   isAuthenticated?: boolean;
-  model: SwaggerSchemaModel;
-  onSave?: () => void;
-  saved?: boolean;
+  onChange: (content: string) => void;
+  onLoad: (content: string, format?: SchemaFormat) => void;
+  onToggleFormat: () => void;
+  schemaStatus: SchemaStatus;
 }>;
 
 export function EditorPane({
+  content,
+  format,
   isAuthenticated = false,
-  model,
-  onSave,
-  saved = false,
+  onChange,
+  onLoad,
+  onToggleFormat,
+  schemaStatus,
 }: EditorPaneProps) {
-  const t = useTranslations('SwaggerEditor');
-  const { content, format, status, toggleFormat, updateContent } = model;
+  const contentRef = useRef(content);
+  const formatRef = useRef(format);
+
+  useEffect(() => {
+    contentRef.current = content;
+    formatRef.current = format;
+  }, [content, format]);
 
   return (
     <EditorWorkspacePane>
-      <PaneToolbar>
-        <div className="flex items-center gap-1.5">
-          <span className="text-muted-foreground text-[11px] font-medium">{t('editorLabel')}</span>
-          <span className="text-muted-foreground/60 text-[11px]">·</span>
-          <span className="text-muted-foreground text-[11px] font-medium uppercase">{format}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          {status !== 'idle' && <EditorStatusBadge status={status} />}
-          {isAuthenticated && status === 'valid' && onSave && (
-            <Button size="xs" variant="ghost" onClick={onSave}>
-              {saved ? (
-                <>
-                  <Check className="size-3" />
-                  <span className="ml-1 hidden sm:inline">{t('saved')}</span>
-                </>
-              ) : (
-                <>
-                  <Save className="size-3" />
-                  <span className="ml-1 hidden sm:inline">{t('save')}</span>
-                </>
-              )}
-            </Button>
-          )}
-          <FormatToggle
-            currentFormat={format}
-            disabled={status === 'idle'}
-            onToggle={toggleFormat}
-          />
-        </div>
-      </PaneToolbar>
-      <PaneBody>
-        <SwaggerEditor format={format} onChange={updateContent} value={content} />
-      </PaneBody>
+      <EditorToolbar
+        contentRef={contentRef}
+        format={format}
+        formatRef={formatRef}
+        isAuthenticated={isAuthenticated}
+        onToggleFormat={onToggleFormat}
+        schemaStatus={schemaStatus}
+      />
+      <EditorBody
+        content={content}
+        format={format}
+        isAuthenticated={isAuthenticated}
+        onChange={onChange}
+        onLoad={onLoad}
+      />
     </EditorWorkspacePane>
-  );
-}
-
-function EditorStatusBadge({ status }: Readonly<{ status: SwaggerSchemaModel['status'] }>) {
-  const t = useTranslations('SwaggerEditor');
-
-  const label =
-    status === 'valid'
-      ? t('statusValid')
-      : status === 'invalid'
-        ? t('statusErrors')
-        : t('statusParsing');
-
-  return (
-    <span
-      className={cn(
-        'rounded-md px-2 py-0.5 text-xs font-medium',
-        status === 'valid' && 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-        status === 'invalid' && 'bg-destructive/10 text-destructive',
-        status === 'pending' && 'bg-muted text-muted-foreground'
-      )}
-    >
-      {label}
-    </span>
   );
 }

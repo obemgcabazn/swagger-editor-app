@@ -1,7 +1,6 @@
 'use client';
 
 import { useSwaggerSchema } from '@/hooks/use-swagger-schema';
-import { useSchemaPersistence } from '@/hooks/use-schema-persistence';
 
 import { EditorPane } from './editor-pane';
 import { SplitWorkspace } from './split-workspace';
@@ -13,20 +12,22 @@ type SwaggerSectionProps = Readonly<{
 }>;
 
 export function SwaggerSection({ initialContent, isAuthenticated = false }: SwaggerSectionProps) {
-  const model = useSwaggerSchema({ initialContent });
-
-  const { saved, save } = useSchemaPersistence({
-    content: model.content,
-    format: model.format,
-    isAuthenticated,
-    onLoad: model.updateContent,
-  });
+  const { content, errors, format, loadContent, parsed, status, toggleFormat, updateContent } =
+    useSwaggerSchema({ initialContent });
 
   return (
     <main className="bg-background flex flex-1 flex-col">
       <SplitWorkspace>
-        <EditorPane isAuthenticated={isAuthenticated} model={model} onSave={save} saved={saved} />
-        <ViewerPane model={model} />
+        <EditorPane
+          content={content}
+          format={format}
+          isAuthenticated={isAuthenticated}
+          onChange={updateContent}
+          onLoad={loadContent}
+          onToggleFormat={toggleFormat}
+          schemaStatus={status}
+        />
+        <ViewerPane errors={errors} parsed={parsed} status={status} />
       </SplitWorkspace>
     </main>
   );

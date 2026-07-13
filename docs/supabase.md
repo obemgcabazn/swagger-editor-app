@@ -68,8 +68,7 @@ Client Component (auth UI only) -> Supabase browser client
 Use server-side Supabase calls for:
 
 - Reading the current user.
-- Loading saved schemas.
-- Saving schemas from app-owned endpoints/actions.
+- Saving schemas and serving saved-schema reads through app-owned API routes.
 - Recording request analytics from the request execution route.
 - Rendering History and Analytics pages.
 
@@ -159,6 +158,12 @@ Routes/actions:
 
 - `POST /api/requests/execute`: execute external REST requests through the server and record
   analytics.
-- Initial saved schema load can happen directly in the main Server Component page.
-- Schema saving can use a Server Action or `PUT /api/schemas/current`.
-- Server-rendered History pages will query Supabase directly from Server Components or server helpers.
+- `GET /api/schemas`: return the authenticated user's saved schema (`content`, `format`).
+- `POST /api/schemas`: upsert the authenticated user's saved schema.
+- Saved schema restore runs on the client via `useRestoreSchema` in `EditorBody` after the editor mounts.
+  The hook calls `GET /api/schemas`; the route handler reads from Supabase with RLS.
+- Server-rendered History pages query Supabase directly from Server Components or server helpers.
+
+Optional future improvement: load the saved schema in the main Server Component and pass it as
+`initialContent` to skip the client restore request. That would remove the restore logic from
+`useRestoreSchema` and `useSaveSchema`, but `POST /api/schemas` would still be needed for explicit saves.

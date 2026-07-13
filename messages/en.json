@@ -60,7 +60,9 @@
     "responses": "Responses",
     "cookieParams": "Cookie parameters",
     "save": "Save",
-    "saved": "Saved!"
+    "saved": "Saved!",
+    "saving": "Saving...",
+    "restoringSchema": "Restoring saved schema..."
   },
   "Error": {
     "title": "Something went wrong",

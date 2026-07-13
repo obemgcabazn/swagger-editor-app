@@ -21,6 +21,15 @@ describe('useSwaggerSchema', () => {
     expect(result.current.parsed).toEqual(JSON.parse(FULL));
   });
 
+  it('loads content with an explicit format', () => {
+    const { result } = renderHook(() => useSwaggerSchema());
+
+    act(() => result.current.loadContent(FULL, 'yaml'));
+
+    expect(result.current.format).toBe('yaml');
+    expect(result.current.status).toBe('valid');
+  });
+
   it('detects json format', () => {
     const { result } = renderHook(() => useSwaggerSchema());
 
