@@ -1,14 +1,14 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signUpAction } from '@/lib/auth/actions';
 import { signUpSchema, type SignUpInput } from '@/lib/auth/schemas';
 import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
+
+import { AuthField } from '@/components/auth/auth-field';
+import { SubmitButton } from '@/components/auth/submit-button';
 
 export function SignUpForm() {
   const router = useRouter();
@@ -38,41 +38,52 @@ export function SignUpForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Label className="mb-2 cursor-pointer" htmlFor="sign-up-name">
-        {t('name')}
-      </Label>
-      <Input id="sign-up-name" type="text" placeholder="John" {...register('name')} />
-      <p>{errors.name?.message && t(`${errors.name.message}`)}</p>
+      <AuthField
+        error={errors.name?.message && t(errors.name.message)}
+        id="sign-up-name"
+        label={t('name')}
+        placeholder="John"
+        register={register('name')}
+      />
 
-      <Label className="mt-5 mb-2 cursor-pointer" htmlFor="sign-up-email">
-        Email
-      </Label>
-      <Input id="sign-up-email" type="email" placeholder="john@email.com" {...register('email')} />
-      <p>{errors.email?.message && t(`${errors.email.message}`)}</p>
+      <AuthField
+        error={errors.email?.message && t(errors.email.message)}
+        id="sign-up-email"
+        label="Email"
+        placeholder="john@email.com"
+        register={register('email')}
+        type="email"
+      />
 
-      <Label className="mt-5 mb-2 cursor-pointer" htmlFor="sign-up-password">
-        {t('password')}
-      </Label>
-      <Input id="sign-up-password" type="password" {...register('password')} />
-      <p>{errors.password?.message && t(`${errors.password.message}`)}</p>
+      <AuthField
+        error={errors.password?.message && t(errors.password.message)}
+        id="sign-up-password"
+        label={t('password')}
+        register={register('password')}
+        type="password"
+      />
 
-      <Label className="mt-5 mb-2 cursor-pointer" htmlFor="sign-up-password-confirm">
-        {t('passwordConfirm')}
-      </Label>
-      <Input id="sign-up-password-confirm" type="password" {...register('passwordConfirm')} />
-      <p>{errors.passwordConfirm?.message && t(`${errors.passwordConfirm.message}`)}</p>
+      <AuthField
+        error={errors.passwordConfirm?.message && t(errors.passwordConfirm.message)}
+        id="sign-up-password-confirm"
+        label={t('passwordConfirm')}
+        register={register('passwordConfirm')}
+        type="password"
+      />
 
-      {errors.root && (
-        <p role="alert" className="text-destructive mt-4">
-          {t(errors.root.message ?? '')}
-        </p>
-      )}
-      <Button type="submit" className="mt-5" disabled={isSubmitting}>
-        {isSubmitting && (
-          <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      <div className="mt-4 min-h-5">
+        {errors.root && (
+          <p className="text-destructive text-sm" role="alert">
+            {t(errors.root.message ?? '')}
+          </p>
         )}
-        <span>{isSubmitting ? t('signUpPending') : t('signUpButton')}</span>
-      </Button>
+      </div>
+
+      <SubmitButton
+        idleLabel={t('signUpButton')}
+        isSubmitting={isSubmitting}
+        pendingLabel={t('signUpPending')}
+      />
     </form>
   );
 }
