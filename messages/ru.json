@@ -75,7 +75,27 @@
   },
   "HistoryPage": {
     "title": "История запросов",
-    "description": "Здесь будут отображаться выполненные API-запросы. Страница скоро появится."
+    "description": "Просматривайте выполненные API-запросы и метрики производительности.",
+    "emptyMessage": "Вы еще не выполняли запросов.",
+    "emptyHint": "Используйте REST-клиент в редакторе, чтобы отправить запрос и начать формировать историю.",
+    "editorLink": "Перейти в редактор",
+    "viewerLink": "Перейти в просмотр",
+    "listSummary": "{count, plural, one {Записан # запрос} few {Записано # запроса} many {Записано # запросов} other {Записано # запросов}}",
+    "viewDetails": "Подробнее",
+    "backToHistory": "Назад к истории",
+    "detailTitle": "Аналитика запроса",
+    "method": "Метод",
+    "endpoint": "Эндпоинт / URL",
+    "statusCode": "Код ответа",
+    "timestamp": "Время запроса",
+    "duration": "Длительность запроса",
+    "requestSize": "Размер запроса",
+    "responseSize": "Размер ответа",
+    "errorDetails": "Детали ошибки",
+    "noError": "Нет",
+    "noBody": "Без тела",
+    "requestHeaders": "Заголовки запроса",
+    "responseHeaders": "Заголовки ответа"
   },
   "Metadata": {
     "title": "Swagger Editor App",

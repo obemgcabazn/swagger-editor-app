@@ -1,9 +1,11 @@
 import 'server-only';
 
-import type { Json } from '@/lib/supabase/database.types';
+import type { Database, Json } from '@/lib/supabase/database.types';
 import { createSupabaseServerClient, getAuthClaims } from '@/lib/supabase/server';
 
 import type { ExecuteRequestResult } from './execute-request';
+
+export type RequestHistoryRow = Database['public']['Tables']['request_history']['Row'];
 
 export type RequestHistoryRecordStatus =
   | {
@@ -60,4 +62,45 @@ export async function recordRequestHistory(
   }
 
   return { recorded: true };
+}
+
+export async function getRequestHistory(): Promise<RequestHistoryRow[]> {
+  const supabase = await createSupabaseServerClient();
+  const claims = await getAuthClaims(supabase);
+
+  if (!claims?.sub) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from('request_history')
+    .select('*')
+    .order('request_timestamp', { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+}
+
+export async function getRequestHistoryEntry(id: string): Promise<RequestHistoryRow | null> {
+  const supabase = await createSupabaseServerClient();
+  const claims = await getAuthClaims(supabase);
+
+  if (!claims?.sub) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('request_history')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 }

@@ -36,7 +36,7 @@ export function SignInForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form data-testid="sign-in-form" method="post" onSubmit={handleSubmit(onSubmit)}>
       <Label className="mt-5 mb-2 cursor-pointer" htmlFor="sign-in-email">
         Email
       </Label>
@@ -54,7 +54,7 @@ export function SignInForm() {
           {t(errors.root.message ?? '')}
         </p>
       )}
-      <Button type="submit" className="mt-5" disabled={isSubmitting}>
+      <Button data-testid="sign-in-submit" type="submit" className="mt-5" disabled={isSubmitting}>
         {isSubmitting && (
           <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
         )}
