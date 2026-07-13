@@ -324,8 +324,6 @@ export function RequestExecutor({ baseUrl, components, endpoint, path }: Request
               const responseSchemaDoc = formatSchemaDocument(getResponseSchema(res, components));
               const responseExampleDoc = formatSchemaDocument(getResponseExample(res, components));
 
-              if (!responseSchemaDoc && !responseExampleDoc) return null;
-
               return (
                 <SchemaToggle
                   key={code}
@@ -354,6 +352,11 @@ export function RequestExecutor({ baseUrl, components, endpoint, path }: Request
                           {responseExampleDoc}
                         </pre>
                       </div>
+                    )}
+                    {!responseSchemaDoc && !responseExampleDoc && (
+                      <span className="text-muted-foreground">
+                        {t('responseDetailsUnavailable')}
+                      </span>
                     )}
                   </div>
                 </SchemaToggle>

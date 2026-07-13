@@ -70,6 +70,7 @@
     "requestExample": "Request example (from spec)",
     "responseSchema": "Response schema (from spec)",
     "responseExample": "Response example (from spec)",
+    "responseDetailsUnavailable": "No response schema or example documented for this status code.",
     "invalidJsonBody": "Request body must be valid JSON.",
     "documentedResponses": "Documented responses (from spec)",
     "executionResult": "Execution result",

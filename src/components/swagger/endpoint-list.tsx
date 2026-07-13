@@ -40,6 +40,20 @@ type EndpointDef = {
   responses?: Record<string, ResponseDef>;
 };
 
+function mergeParameters(
+  pathParameters: Param[] | undefined,
+  operationParameters: Param[] | undefined
+): Param[] {
+  const merged = [...(pathParameters ?? []), ...(operationParameters ?? [])];
+
+  // Operation-level parameters override path-level ones with same name + location.
+  return merged.filter(
+    (param, index, arr) =>
+      index ===
+      arr.findLastIndex((candidate) => candidate.in === param.in && candidate.name === param.name)
+  );
+}
+
 export function EndpointList({ schema }: EndpointListProps) {
   const t = useTranslations('SwaggerEditor');
   const [expandedPath, setExpandedPath] = useState<string | null>(null);
@@ -54,10 +68,12 @@ export function EndpointList({ schema }: EndpointListProps) {
       )
       .map((method) => {
         const d = methods[method] as Record<string, unknown>;
+        const pathParameters = methods.parameters as Param[] | undefined;
+        const operationParameters = d.parameters as Param[] | undefined;
 
         return {
           method: method.toUpperCase(),
-          parameters: (d.parameters as Param[]) ?? [],
+          parameters: mergeParameters(pathParameters, operationParameters),
           path,
           requestBody: d.requestBody as EndpointDef['requestBody'],
           responses: d.responses as EndpointDef['responses'],

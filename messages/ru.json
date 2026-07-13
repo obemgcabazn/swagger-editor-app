@@ -70,6 +70,7 @@
     "requestExample": "Пример запроса (из спецификации)",
     "responseSchema": "Схема ответа (из спецификации)",
     "responseExample": "Пример ответа (из спецификации)",
+    "responseDetailsUnavailable": "Для этого кода ответа не задокументированы схема или пример.",
     "invalidJsonBody": "Тело запроса должно быть валидным JSON.",
     "documentedResponses": "Документированные ответы (из спецификации)",
     "executionResult": "Результат выполнения",
