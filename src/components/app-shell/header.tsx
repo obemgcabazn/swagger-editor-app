@@ -5,7 +5,9 @@ import { buttonVariants } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
 import { getAuthClaims } from '@/lib/supabase/server';
 
+import { HistoryNavButton } from './history-nav-button';
 import { LanguageSwitcher } from './language-switcher';
+import { HeaderNav } from './header-nav';
 
 type GuestActionsProps = Readonly<{
   signInLabel: string;
@@ -13,6 +15,7 @@ type GuestActionsProps = Readonly<{
 }>;
 
 type AuthenticatedActionsProps = Readonly<{
+  historyLabel: string;
   name: string | null;
   signOutLabel: string;
 }>;
@@ -30,10 +33,11 @@ function GuestActions({ signInLabel, signUpLabel }: GuestActionsProps) {
   );
 }
 
-function AuthenticatedActions({ name, signOutLabel }: AuthenticatedActionsProps) {
+function AuthenticatedActions({ historyLabel, name, signOutLabel }: AuthenticatedActionsProps) {
   return (
     <>
       {name && <span className="text-muted-foreground text-sm">{name}</span>}
+      <HistoryNavButton label={historyLabel} />
       <form action={signOutAction}>
         <button className={buttonVariants({ size: 'sm' })} type="submit">
           {signOutLabel}
@@ -68,31 +72,17 @@ export async function Header() {
           <div className="flex items-center gap-2">
             <LanguageSwitcher label={navigation('language')} />
             {isAuthenticated ? (
-              <AuthenticatedActions name={name} signOutLabel={auth('signOut')} />
+              <AuthenticatedActions
+                historyLabel={navigation('history')}
+                name={name}
+                signOutLabel={auth('signOut')}
+              />
             ) : (
               <GuestActions signInLabel={auth('signIn')} signUpLabel={auth('signUp')} />
             )}
           </div>
         </div>
-        <nav aria-label="Primary" className="flex items-center gap-4 text-sm">
-          <Link className="text-muted-foreground hover:text-foreground transition-colors" href="/">
-            {navigation('main')}
-          </Link>
-          {isAuthenticated ? (
-            <Link
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              href="/history"
-            >
-              {navigation('history')}
-            </Link>
-          ) : null}
-          <Link
-            className="text-muted-foreground hover:text-foreground transition-colors"
-            href="/about"
-          >
-            {navigation('about')}
-          </Link>
-        </nav>
+        <HeaderNav aboutLabel={navigation('about')} mainLabel={navigation('main')} />
       </div>
     </header>
   );
