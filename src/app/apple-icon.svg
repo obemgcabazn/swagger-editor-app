@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none" role="img" aria-label="Swagger Editor App">
+  <rect width="180" height="180" rx="40" fill="#252525"/>
+  <path
+    d="M50 58c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v64c0 6.6-5.4 12-12 12H62c-6.6 0-12-5.4-12-12V58Z"
+    stroke="#FAFAFA"
+    stroke-width="8"
+  />
+  <path
+    d="M68 78h44M68 98h30"
+    stroke="#85EA2D"
+    stroke-width="8"
+    stroke-linecap="round"
+  />
+  <path
+    d="M115 118 129 104 115 90"
+    stroke="#61AFFE"
+    stroke-width="8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
