@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { FormatToggle } from '@/components/swagger/format-toggle';
+import { SchemaToggle } from '@/components/swagger/schema-toggle';
 import { ValidationErrors } from '@/components/swagger/validation-errors';
 
 describe('FormatToggle', () => {
@@ -29,5 +30,19 @@ describe('ValidationErrors', () => {
     render(<ValidationErrors errors={['Error 1', 'Error 2']} />);
     expect(screen.getByText('Error 1')).toBeInTheDocument();
     expect(screen.getByText('Error 2')).toBeInTheDocument();
+  });
+});
+
+describe('SchemaToggle', () => {
+  it('hides content until expanded', async () => {
+    const user = userEvent.setup();
+
+    render(<SchemaToggle content='{"id":1}' label="Request schema (from spec)" />);
+
+    expect(screen.queryByText('{"id":1}')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /request schema/i }));
+
+    expect(screen.getByText('{"id":1}')).toBeInTheDocument();
   });
 });

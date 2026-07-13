@@ -36,4 +36,36 @@ describe('generateCurlCommand', () => {
     expect(curl).toContain("-H 'content-type: application/json'");
     expect(curl).toContain(`-d '{"name":"Ada"}'`);
   });
+
+  it('compacts pretty-printed JSON bodies onto one line', () => {
+    const headers = buildRequestHeaders({
+      contentType: 'application/json',
+      headers: [],
+    });
+
+    const curl = generateCurlCommand(
+      'POST',
+      'https://jsonplaceholder.typicode.com/posts',
+      headers,
+      '{\n  "title": "foo",\n  "body": "bar",\n  "userId": 1\n}'
+    );
+
+    expect(curl).toContain(`-d '{"title":"foo","body":"bar","userId":1}'`);
+  });
+
+  it('escapes single quotes in JSON bodies for shell safety', () => {
+    const headers = buildRequestHeaders({
+      contentType: 'application/json',
+      headers: [],
+    });
+
+    const curl = generateCurlCommand(
+      'POST',
+      'https://api.example.com/users',
+      headers,
+      `{"name":"O'Brien"}`
+    );
+
+    expect(curl).toContain(`-d '{"name":"O'\\''Brien"}'`);
+  });
 });
