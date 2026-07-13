@@ -5,7 +5,9 @@ import { describe, expect, it, vi } from 'vitest';
 import type { TeamMember } from '@/content/team';
 
 vi.mock('next/image', () => ({
-  default: ({ alt, src }: ComponentProps<'img'>) => <img alt={alt} src={src} />,
+  default: ({ alt, src }: ComponentProps<'img'>) => (
+    <span aria-label={alt} data-src={src} role="img" />
+  ),
 }));
 
 import { TeamMemberCard } from '@/components/about/team-member-card';
@@ -24,7 +26,7 @@ describe('TeamMemberCard', () => {
     expect(screen.getByRole('heading', { name: 'Ada Lovelace' })).toBeInTheDocument();
     expect(screen.getByText('Developer')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Ada Lovelace' })).toHaveAttribute(
-      'src',
+      'data-src',
       '/team/ada.jpg'
     );
   });

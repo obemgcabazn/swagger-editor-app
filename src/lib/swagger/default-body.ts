@@ -16,10 +16,10 @@ export function getDefaultBody(
     return JSON.stringify(content.example, null, 2);
   }
 
-  return getDefaultBodyFromSchema(resolveSchema(content.schema, components), components);
+  return getDefaultBodyFromSchema(resolveSchema(content.schema, components));
 }
 
-function getDefaultBodyFromSchema(schema: unknown, components?: OpenApiComponents): string {
+function getDefaultBodyFromSchema(schema: unknown): string {
   if (!schema || typeof schema !== 'object') return '';
 
   const s = schema as Record<string, unknown>;
